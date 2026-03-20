@@ -17,10 +17,11 @@ export const formatDate = (date: Date): string => {
 export const downloadFile = async (fileUrl: string, fileName: string) => {
   try {
     const file = await fetchFileToBase64(fileUrl, fileName)
+    if (!file) throw new Error('File not found')
 
     const link = document.createElement('a')
-    link.href = file?.base64!
-    link.download = file?.filename!
+    link.href = file.base64
+    link.download = file.filename
     link.target = '_blank'
     link.style.display = 'none'
 

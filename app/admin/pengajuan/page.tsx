@@ -241,7 +241,7 @@ export default function DaftarPengajuanPage() {
                       </td>
                       <td className="py-3.5 px-4">
                         <button
-                          onClick={() => handleViewDetail(item.id)}
+                          onClick={() => handleViewDetail(item.id, item.status)}
                           className="px-3.5 py-1.5 bg-blue-50 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-100 transition-colors">
                           Tinjau
                         </button>

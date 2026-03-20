@@ -7,7 +7,7 @@ import { adminService } from '@/services/admin'
 import { LocationViewer, type LocationMarker } from '@/components/core/location-viewer'
 import { toast } from 'sonner'
 
-interface Recipient extends LocationMarker {}
+type Recipient = LocationMarker
 
 export default function MonitoringPetaPage() {
   const { token } = useAuthStore()
@@ -78,7 +78,7 @@ export default function MonitoringPetaPage() {
 
   // Filter recipients based on status
   const filteredRecipients = recipients.filter((r) => {
-    return filterStatus === 'semua' || r.status === filterStatus
+    return filterStatus === 'semua' || (r.status as string) === filterStatus
   })
 
   // Calculate stats
