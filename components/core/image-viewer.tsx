@@ -40,7 +40,6 @@ const ImageViewer = ({
     img.src = src
     img.onload = () => {
       setIsLoaded(true)
-      onImageLoad?.()
     }
     img.onerror = () => {
       setIsLoaded(true)
@@ -50,7 +49,14 @@ const ImageViewer = ({
       img.onload = null
       img.onerror = null
     }
-  }, [src, onImageLoad])
+  }, [src])
+
+  // Separate effect for callback to avoid infinite loops
+  useEffect(() => {
+    if (isLoaded) {
+      onImageLoad?.()
+    }
+  }, [isLoaded, onImageLoad])
 
   const handleClose = () => {
     setIsOpen(false)

@@ -107,7 +107,7 @@ export default function DaftarPengajuanPage() {
     const matchSearch =
       item.nomor_pengajuan?.toLowerCase().includes(search.toLowerCase()) ||
       item.profil?.nik?.includes(search) ||
-      item.profil?.user?.name?.toLowerCase().includes(search.toLowerCase())
+      item.profil?.nama?.toLowerCase().includes(search.toLowerCase())
     return matchSearch
   })
 
@@ -232,7 +232,7 @@ export default function DaftarPengajuanPage() {
                     <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
                       <td className="py-3.5 px-4 text-sm font-semibold text-slate-700">{item.nomor_pengajuan}</td>
                       <td className="py-3.5 px-4 text-sm font-semibold text-slate-800">
-                        {item.profil?.user?.name || 'Masyarakat'}
+                        {item.profil?.nama || 'Masyarakat'}
                       </td>
                       <td className="py-3.5 px-4 text-sm text-slate-600">{item.profil?.nik}</td>
                       <td className="py-3.5 px-4 text-sm text-slate-500">{tanggal}</td>

@@ -2,7 +2,7 @@
 
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import 'leaflet/dist/leaflet.css'
 
 export interface LocationMarker {
@@ -62,8 +62,8 @@ export function LocationViewer({ markers = [], lat = -6.2, long = 106.8, singleM
     lng: long || 106.8
   })
 
-  // Calculate center and bounds for multiple markers
-  const calculateCenter = () => {
+  // Memoize the calculation of center to avoid infinite loops
+  const centerCoordinates = useMemo(() => {
     if (markers && markers.length > 0) {
       const lats = markers.map((m) => m.latitude)
       const lngs = markers.map((m) => m.longitude)
@@ -71,25 +71,23 @@ export function LocationViewer({ markers = [], lat = -6.2, long = 106.8, singleM
       const avgLng = (Math.min(...lngs) + Math.max(...lngs)) / 2
       return { lat: avgLat, lng: avgLng }
     }
-    return { lat: lat || -6.2, lng: long || 106.8 }
-  }
 
-  // Update coordinates when props change
-  useEffect(() => {
-    if (markers && markers.length > 0) {
-      const center = calculateCenter()
-      setCoordinates(center)
-    } else if (lat && long) {
-      const parsedLat = parseFloat(String(lat))
-      const parsedLng = parseFloat(String(long))
-      if (!isNaN(parsedLat) && !isNaN(parsedLng)) {
-        setCoordinates({ lat: parsedLat, lng: parsedLng })
-      }
+    const parsedLat = parseFloat(String(lat))
+    const parsedLng = parseFloat(String(long))
+    if (!isNaN(parsedLat) && !isNaN(parsedLng)) {
+      return { lat: parsedLat, lng: parsedLng }
     }
-  }, [markers, lat, long])
+
+    return { lat: -6.2, lng: 106.8 }
+  }, [markers?.length, markers?.map((m) => `${m.latitude},${m.longitude}`).join(';'), lat, long])
+
+  // Update coordinates only when centerCoordinates actually changes
+  useEffect(() => {
+    setCoordinates(centerCoordinates)
+  }, [centerCoordinates.lat, centerCoordinates.lng])
 
   // Determine zoom level based on marker spread
-  const calculateZoom = () => {
+  const calculateZoom = useMemo(() => {
     if (!markers || markers.length <= 1) return 15
     const lats = markers.map((m) => m.latitude)
     const lngs = markers.map((m) => m.longitude)
@@ -102,7 +100,7 @@ export function LocationViewer({ markers = [], lat = -6.2, long = 106.8, singleM
     if (maxDiff < 0.1) return 13
     if (maxDiff < 0.2) return 12
     return 11
-  }
+  }, [markers?.length])
 
   const getStatusIcon = (status: 'sudah_menerima' | 'belum_menerima') => {
     return status === 'sudah_menerima' ? IconSuccess : IconPending
@@ -180,7 +178,7 @@ export function LocationViewer({ markers = [], lat = -6.2, long = 106.8, singleM
       <div className="w-full aspect-video rounded-lg overflow-hidden border border-slate-200 relative shadow-sm">
         <MapContainer
           center={[coordinates.lat, coordinates.lng]}
-          zoom={calculateZoom()}
+          zoom={calculateZoom}
           style={{ width: '100%', height: '100%' }}
           dragging={true}
           zoomControl={true}
