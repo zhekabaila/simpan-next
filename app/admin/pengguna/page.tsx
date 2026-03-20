@@ -1,0 +1,263 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { Search, UserPlus, MoreVertical, Shield, HardHat, Users, AlertCircle } from 'lucide-react'
+import useAuthStore from '@/app/_stores/useAuthStore'
+import { adminService } from '@/services/admin'
+
+type Role = 'semua' | 'masyarakat' | 'petugas' | 'admin'
+
+const roleConfig = {
+  masyarakat: {
+    icon: Users,
+    label: 'Masyarakat',
+    bg: 'bg-blue-50',
+    color: 'text-blue-600'
+  },
+  petugas: {
+    icon: HardHat,
+    label: 'Petugas',
+    bg: 'bg-amber-50',
+    color: 'text-amber-600'
+  },
+  admin: {
+    icon: Shield,
+    label: 'Admin',
+    bg: 'bg-purple-50',
+    color: 'text-purple-600'
+  }
+}
+
+export default function PenggunaPage() {
+  const { token } = useAuthStore()
+  const [search, setSearch] = useState('')
+  const [filterRole, setFilterRole] = useState<Role>('semua')
+  const [users, setUsers] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [userCount, setUserCount] = useState({
+    semua: 0,
+    petugas: 0,
+    masyarakat: 0,
+    admin: 0
+  })
+
+  useEffect(() => {
+    if (!token) return
+
+    const fetchUsers = async () => {
+      try {
+        const result = await adminService.getDaftarPengguna(token, 1, 100, filterRole !== 'semua' ? filterRole : undefined)
+        if (result.data) {
+          setUsers(result.data)
+        }
+      } catch (err: any) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchUsers()
+  }, [token, filterRole])
+
+  useEffect(() => {
+    if (!token) return
+
+    const fetchAllUserCounts = async () => {
+      setLoading(true)
+      try {
+        const roles = ['semua', 'petugas', 'admin', 'masyarakat']
+        const countPromises = roles.map((role) => {
+          adminService
+            .getDaftarPengguna(token, 1, 100, role !== 'semua' ? role : undefined)
+            .then((result) => {
+              console.log(role, result)
+              setUserCount((e) => {
+                return {
+                  ...e,
+                  [role]: result.size
+                }
+              })
+            })
+            .catch((err) => {
+              console.error(`Failed to fetch count for ${role}:`, err)
+              return { role, count: 0 }
+            })
+        })
+
+        await Promise.all(countPromises)
+      } catch (err: any) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchAllUserCounts()
+  }, [token])
+
+  const handleToggleStatus = async (userId: string) => {
+    if (!token) return
+    try {
+      await adminService.toggleStatusPengguna(token, userId)
+      // Refresh list
+      const result = await adminService.getDaftarPengguna(token, 1, 100, filterRole !== 'semua' ? filterRole : undefined)
+      if (result.data) setUsers(result.data)
+    } catch (err: any) {
+      setError(err.message)
+    }
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-5">
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-5 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="font-semibold text-red-900">Error</p>
+            <p className="text-sm text-red-700 mt-1">{error}</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-5">
+        <div className="space-y-3">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="h-16 bg-slate-200 rounded-2xl animate-pulse" />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  const filtered = users.filter((u) => {
+    const matchSearch =
+      u.nama?.toLowerCase().includes(search.toLowerCase()) || u.email?.toLowerCase().includes(search.toLowerCase())
+    return matchSearch
+  })
+
+  return (
+    <div className="space-y-5">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-slate-800">Manajemen Pengguna</h1>
+          <p className="text-sm text-slate-500">Kelola akun Masyarakat, Petugas, dan Admin</p>
+        </div>
+      </div>
+
+      {/* Filter Tabs */}
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {(['semua', 'masyarakat', 'petugas', 'admin'] as Role[]).map((r) => (
+          <button
+            key={r}
+            onClick={() => setFilterRole(r)}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all border ${
+              filterRole === r
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+            }`}>
+            <span className="capitalize">
+              {r === 'semua'
+                ? 'Semua'
+                : (roleConfig[r as keyof typeof roleConfig] as (typeof roleConfig)[keyof typeof roleConfig])?.label}
+            </span>
+            <span
+              className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${
+                filterRole === r ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
+              }`}>
+              {userCount?.[r]}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Cari nama atau email..."
+          className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition shadow-sm"
+        />
+      </div>
+
+      {/* Table */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-max">
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-100 text-xs text-slate-500">
+                <th className="text-left py-3 px-4 font-semibold">Nama</th>
+                <th className="text-left py-3 px-4 font-semibold">Email</th>
+                <th className="text-left py-3 px-4 font-semibold">Peran</th>
+                <th className="text-left py-3 px-4 font-semibold">Status</th>
+                <th className="text-left py-3 px-4 font-semibold">Bergabung</th>
+                <th className="text-left py-3 px-4 font-semibold">Aksi</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {filtered.length > 0 ? (
+                filtered.map((user) => {
+                  const roleCfg = roleConfig[user.role as keyof typeof roleConfig]
+                  const RoleIcon = roleCfg.icon
+                  const bergabung = user.created_at ? new Date(user.created_at).toLocaleDateString('id-ID') : 'N/A'
+                  return (
+                    <tr key={user.id} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="py-3.5 px-4">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                            {user.nama.charAt(0)}
+                          </div>
+                          <span className="text-sm font-semibold text-slate-800">{user.nama}</span>
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-4 text-sm text-slate-500">{user.email}</td>
+                      <td className="py-3.5 px-4">
+                        <div
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${roleCfg.bg} ${roleCfg.color}`}>
+                          <RoleIcon className="w-3 h-3" />
+                          {roleCfg.label}
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <button
+                          onClick={() => handleToggleStatus(user.id)}
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-colors cursor-pointer ${
+                            user.aktif
+                              ? 'bg-green-50 text-green-700 hover:bg-green-100'
+                              : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                          }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${user.aktif ? 'bg-green-500' : 'bg-slate-400'}`} />
+                          {user.aktif ? 'Aktif' : 'Nonaktif'}
+                        </button>
+                      </td>
+                      <td className="py-3.5 px-4 text-sm text-slate-500">{bergabung}</td>
+                      <td className="py-3.5 px-4">
+                        <button className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors">
+                          <MoreVertical className="w-4 h-4 text-slate-500" />
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })
+              ) : (
+                <tr>
+                  <td colSpan={6} className="py-8 px-4 text-center text-slate-500 text-sm">
+                    Tidak ada pengguna ditemukan
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  )
+}

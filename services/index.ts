@@ -6,6 +6,7 @@ const version = 'api/'
 export const API = axios.create({
   baseURL: `${API_URL}/${version}`,
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    Accept: 'application/json'
   }
 })

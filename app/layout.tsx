@@ -2,8 +2,10 @@ import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import './globals.css'
 import { ThemeProvider } from './_components/theme-provider'
+import { AuthProvider } from './_components/auth-provider'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Toaster } from '@/components/ui/sonner'
+import { cookies } from 'next/headers'
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -21,17 +23,24 @@ export const metadata: Metadata = {
   description: 'Starting Template'
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const c = await cookies()
+  const token = c.get('token')?.value
+
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          <TooltipProvider>{children}</TooltipProvider>
-          <Toaster />
+          <AuthProvider cookiesToken={token ?? ''}>
+            <TooltipProvider>
+              {children}
+              <Toaster richColors position="top-right" />
+            </TooltipProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

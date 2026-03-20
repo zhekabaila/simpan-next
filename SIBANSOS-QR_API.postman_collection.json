@@ -1,0 +1,1517 @@
+{
+  "info": {
+    "_postman_id": "sibansos-qr-api-2026",
+    "name": "SIBANSOS-QR API",
+    "description": "REST API untuk Sistem Distribusi Bantuan Sosial dengan Verifikasi QR Code",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "27017582"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nama\": \"John Doe\",\n    \"email\": \"user@sibansos.id\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register pengguna baru dengan role masyarakat"
+          },
+          "response": [
+            {
+              "name": "Register Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"nama\": \"John Doe\",\n    \"email\": \"user@sibansos.id\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/auth/register",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "auth", "register"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Registrasi berhasil\",\n    \"data\": {\n        \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n        \"nama\": \"John Doe\",\n        \"email\": \"user@sibansos.id\",\n        \"aktif\": true,\n        \"roles\": [\"masyarakat\"],\n        \"permissions\": [],\n        \"created_at\": \"2026-03-16T09:30:00.000Z\"\n    },\n    \"token_type\": \"bearer\",\n    \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"expires_in\": 3600\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@sibansos.id\",\n    \"password\": \"admin123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login dan dapatkan JWT token"
+          },
+          "response": [
+            {
+              "name": "Login Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"admin@sibansos.id\",\n    \"password\": \"admin123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/auth/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "auth", "login"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Login berhasil\",\n    \"data\": {\n        \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n        \"nama\": \"Admin\",\n        \"email\": \"admin@sibansos.id\",\n        \"aktif\": true,\n        \"roles\": [\"admin\"],\n        \"permissions\": [\n            \"kelola-pengguna\",\n            \"kelola-periode-bansos\",\n            \"tinjau-pengajuan\"\n        ],\n        \"created_at\": \"2026-03-16T09:00:00.000Z\"\n    },\n    \"token_type\": \"bearer\",\n    \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"expires_in\": 3600\n}"
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "logout"]
+            },
+            "description": "Logout dan invalidate token"
+          },
+          "response": [
+            {
+              "name": "Logout Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/auth/logout",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "auth", "logout"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Logout berhasil\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/refresh",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "refresh"]
+            },
+            "description": "Refresh JWT token"
+          },
+          "response": [
+            {
+              "name": "Refresh Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/auth/refresh",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "auth", "refresh"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Token refreshed\",\n    \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"token_type\": \"bearer\",\n    \"expires_in\": 3600\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "me"]
+            },
+            "description": "Dapatkan data user yang sedang login"
+          },
+          "response": [
+            {
+              "name": "Get User Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/auth/me",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "auth", "me"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Data user ditemukan\",\n    \"data\": {\n        \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n        \"nama\": \"Admin\",\n        \"email\": \"admin@sibansos.id\",\n        \"aktif\": true,\n        \"roles\": [\"admin\"],\n        \"permissions\": [\n            \"kelola-pengguna\",\n            \"kelola-periode-bansos\"\n        ],\n        \"created_at\": \"2026-03-16T09:00:00.000Z\"\n    }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Masyarakat - Profil",
+      "item": [
+        {
+          "name": "Get Profil",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/masyarakat/profil",
+              "host": ["{{base_url}}"],
+              "path": ["api", "masyarakat", "profil"]
+            },
+            "description": "Dapatkan profil masyarakat"
+          }
+        },
+        {
+          "name": "Create/Update Profil",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nik\": \"3201021234567890\",\n    \"nomor_telepon\": \"081234567890\",\n    \"alamat\": \"Jl. Merdeka No. 123\",\n    \"tanggal_lahir\": \"1990-01-15\",\n    \"jenis_kelamin\": \"L\",\n    \"rt\": \"001\",\n    \"rw\": \"002\",\n    \"kelurahan\": \"Kelurahan Pabean\",\n    \"kecamatan\": \"Kecamatan Genuk\",\n    \"kota\": \"Kota Semarang\",\n    \"provinsi\": \"Jawa Tengah\",\n    \"latitude\": -7.2405,\n    \"longitude\": 110.4063,\n    \"status_pernikahan\": \"menikah\",\n    \"jumlah_tanggungan\": 2,\n    \"status_pekerjaan\": \"bekerja\",\n    \"penghasilan_bulanan\": 2000000,\n    \"status_kepemilikan_rumah\": \"milik_sendiri\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/masyarakat/profil",
+              "host": ["{{base_url}}"],
+              "path": ["api", "masyarakat", "profil"]
+            },
+            "description": "Buat atau update profil masyarakat"
+          }
+        },
+        {
+          "name": "Upload Foto Rumah",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "jenis_foto",
+                  "value": "tampak_depan",
+                  "type": "text"
+                },
+                {
+                  "key": "foto",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "keterangan",
+                  "value": "Foto tampak depan rumah",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/masyarakat/profil/foto-rumah",
+              "host": ["{{base_url}}"],
+              "path": ["api", "masyarakat", "profil", "foto-rumah"]
+            },
+            "description": "Upload foto rumah (jenis_foto: tampak_depan, ruang_tamu, kamar_tidur, kamar_mandi, dapur, atap_dinding, sumber_air, jamban)"
+          }
+        },
+        {
+          "name": "Get Daftar Foto Rumah",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/masyarakat/profil/foto-rumah",
+              "host": ["{{base_url}}"],
+              "path": ["api", "masyarakat", "profil", "foto-rumah"]
+            },
+            "description": "Dapatkan semua foto rumah"
+          }
+        },
+        {
+          "name": "Delete Foto Rumah",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/masyarakat/profil/foto-rumah/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "masyarakat", "profil", "foto-rumah", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "foto-id-uuid"
+                }
+              ]
+            },
+            "description": "Hapus foto rumah berdasarkan ID"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Masyarakat - Pengajuan",
+      "item": [
+        {
+          "name": "Submit Pengajuan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/masyarakat/pengajuan",
+              "host": ["{{base_url}}"],
+              "path": ["api", "masyarakat", "pengajuan"]
+            },
+            "description": "Submit pengajuan bansos. Profil harus sudah lengkap (nik, alamat, status_pekerjaan, penghasilan_bulanan)"
+          }
+        },
+        {
+          "name": "Get Status Pengajuan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/masyarakat/pengajuan",
+              "host": ["{{base_url}}"],
+              "path": ["api", "masyarakat", "pengajuan"]
+            },
+            "description": "Dapatkan status pengajuan terbaru"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Masyarakat - QR Code",
+      "item": [
+        {
+          "name": "Get QR Code",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/masyarakat/qrcode",
+              "host": ["{{base_url}}"],
+              "path": ["api", "masyarakat", "qrcode"]
+            },
+            "description": "Dapatkan QR Code jika pengajuan sudah disetujui"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Masyarakat - Notifikasi",
+      "item": [
+        {
+          "name": "Get Notifikasi",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/masyarakat/notifikasi?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "masyarakat", "notifikasi"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Dapatkan daftar notifikasi pengguna"
+          }
+        },
+        {
+          "name": "Mark Notifikasi as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/masyarakat/notifikasi/:id/baca",
+              "host": ["{{base_url}}"],
+              "path": ["api", "masyarakat", "notifikasi", ":id", "baca"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "notifikasi-id-uuid"
+                }
+              ]
+            },
+            "description": "Tandai notifikasi sebagai sudah dibaca"
+          }
+        },
+        {
+          "name": "Mark All Notifikasi as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/masyarakat/notifikasi/baca-semua",
+              "host": ["{{base_url}}"],
+              "path": ["api", "masyarakat", "notifikasi", "baca-semua"]
+            },
+            "description": "Tandai semua notifikasi sebagai sudah dibaca"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Petugas - Penugasan",
+      "item": [
+        {
+          "name": "Get Daftar Penugasan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/petugas/penugasan?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "petugas", "penugasan"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Dapatkan daftar penugasan yang aktif"
+          }
+        },
+        {
+          "name": "Get Detail Penugasan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/petugas/penugasan/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "petugas", "penugasan", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "penugasan-id-uuid"
+                }
+              ]
+            },
+            "description": "Dapatkan detail penugasan dengan statistik distribusi"
+          }
+        },
+        {
+          "name": "Scan QR Code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"token_qr\": \"550e8400-e29b-41d4-a716-446655440002\",\n    \"periode_bansos_id\": \"550e8400-e29b-41d4-a716-446655440003\",\n    \"latitude_scan\": -7.2405,\n    \"longitude_scan\": 110.4063\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/petugas/scan-qr",
+              "host": ["{{base_url}}"],
+              "path": ["api", "petugas", "scan-qr"]
+            },
+            "description": "Scan QR Code untuk verifikasi distribusi bansos. Validasi: QR harus aktif, penerima harus disetujui, cek duplikat"
+          }
+        },
+        {
+          "name": "Get Riwayat Distribusi",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/petugas/riwayat-distribusi?page=1&limit=20&status=diterima&tanggal=2026-03-16",
+              "host": ["{{base_url}}"],
+              "path": ["api", "petugas", "riwayat-distribusi"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "status",
+                  "value": "diterima",
+                  "disabled": true
+                },
+                {
+                  "key": "tanggal",
+                  "value": "2026-03-16",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Dapatkan riwayat distribusi bansos petugas"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Pengajuan",
+      "item": [
+        {
+          "name": "Get Daftar Pengajuan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/pengajuan?page=1&limit=20&status=menunggu&search=",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "pengajuan"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "status",
+                  "value": "menunggu",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Dapatkan daftar pengajuan (filter: status, search nama/nik)"
+          }
+        },
+        {
+          "name": "Get Detail Pengajuan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/pengajuan/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "pengajuan", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "pengajuan-id-uuid"
+                }
+              ]
+            },
+            "description": "Dapatkan detail pengajuan beserta profil dan foto rumah"
+          }
+        },
+        {
+          "name": "Approve Pengajuan",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/pengajuan/:id/setujui",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "pengajuan", ":id", "setujui"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "pengajuan-id-uuid"
+                }
+              ]
+            },
+            "description": "Setujui pengajuan (akan generate QR Code dan kirim notifikasi)"
+          }
+        },
+        {
+          "name": "Reject Pengajuan",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"catatan_admin\": \"Data tidak memenuhi kriteria penerima bansos\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/pengajuan/:id/tolak",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "pengajuan", ":id", "tolak"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "pengajuan-id-uuid"
+                }
+              ]
+            },
+            "description": "Tolak pengajuan (min 10 karakter catatan_admin)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Periode Bansos",
+      "item": [
+        {
+          "name": "Get Daftar Periode",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/periode-bansos?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "periode-bansos"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Dapatkan daftar periode bansos (latest first)"
+          }
+        },
+        {
+          "name": "Create Periode Bansos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nama_periode\": \"Bansos Maret 2026\",\n    \"jenis_bantuan\": \"sembako\",\n    \"tanggal_mulai\": \"2026-03-16\",\n    \"tanggal_selesai\": \"2026-03-31\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/periode-bansos",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "periode-bansos"]
+            },
+            "description": "Buat periode bansos baru (jenis_bantuan: sembako, tunai, bpnt, pkh, lainnya)"
+          }
+        },
+        {
+          "name": "Get Detail Periode",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/periode-bansos/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "periode-bansos", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "periode-id-uuid"
+                }
+              ]
+            },
+            "description": "Dapatkan detail periode bansos"
+          }
+        },
+        {
+          "name": "Update Periode Bansos",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nama_periode\": \"Bansos Maret 2026 - Updated\",\n    \"jenis_bantuan\": \"tunai\",\n    \"status\": \"aktif\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/periode-bansos/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "periode-bansos", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "periode-id-uuid"
+                }
+              ]
+            },
+            "description": "Update periode bansos"
+          }
+        },
+        {
+          "name": "Delete Periode Bansos",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/periode-bansos/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "periode-bansos", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "periode-id-uuid"
+                }
+              ]
+            },
+            "description": "Hapus periode bansos (hanya jika status akan_datang)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Penugasan Petugas",
+      "item": [
+        {
+          "name": "Get Daftar Penugasan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/penugasan?page=1&limit=10&periode_id=&petugas_id=",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "penugasan"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "periode_id",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "petugas_id",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Dapatkan daftar penugasan petugas"
+          }
+        },
+        {
+          "name": "Create Penugasan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"petugas_id\": \"550e8400-e29b-41d4-a716-446655440004\",\n    \"periode_bansos_id\": \"550e8400-e29b-41d4-a716-446655440003\",\n    \"deskripsi_wilayah\": \"Kelurahan Pabean, Genuk\",\n    \"latitude_wilayah\": -7.2405,\n    \"longitude_wilayah\": 110.4063\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/penugasan",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "penugasan"]
+            },
+            "description": "Buat penugasan untuk petugas (petugas harus punya role petugas)"
+          }
+        },
+        {
+          "name": "Get Detail Penugasan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/penugasan/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "penugasan", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "penugasan-id-uuid"
+                }
+              ]
+            },
+            "description": "Dapatkan detail penugasan dengan statistik distribusi"
+          }
+        },
+        {
+          "name": "Update Penugasan",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"deskripsi_wilayah\": \"Kelurahan Pabean - Genuk (updated)\",\n    \"status\": \"sedang_berjalan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/penugasan/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "penugasan", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "penugasan-id-uuid"
+                }
+              ]
+            },
+            "description": "Update penugasan"
+          }
+        },
+        {
+          "name": "Delete Penugasan",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/penugasan/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "penugasan", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "penugasan-id-uuid"
+                }
+              ]
+            },
+            "description": "Hapus penugasan"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Monitoring",
+      "item": [
+        {
+          "name": "Get Statistik",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/monitoring/statistik",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "monitoring", "statistik"]
+            },
+            "description": "Dapatkan statistik pengajuan dan distribusi bansos"
+          }
+        },
+        {
+          "name": "Get Distribusi by Periode",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/monitoring/distribusi/:periode_id?page=1&limit=20&status=&kota=&kecamatan=",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "monitoring", "distribusi", ":periode_id"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "kota",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "kecamatan",
+                  "value": "",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "periode_id",
+                  "value": "periode-id-uuid"
+                }
+              ]
+            },
+            "description": "Dapatkan daftar distribusi untuk periode tertentu (dengan NIK tersamar)"
+          }
+        },
+        {
+          "name": "Get Peta Sebaran",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/monitoring/peta/:periode_id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "monitoring", "peta", ":periode_id"],
+              "variable": [
+                {
+                  "key": "periode_id",
+                  "value": "periode-id-uuid"
+                }
+              ]
+            },
+            "description": "Dapatkan data peta sebaran penerima bansos (koordinat lat/lng)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Notifikasi",
+      "item": [
+        {
+          "name": "Get Daftar Notifikasi",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/notifikasi?page=1&limit=20&jenis=&user_id=",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "notifikasi"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "jenis",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "user_id",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Dapatkan daftar semua notifikasi"
+          }
+        },
+        {
+          "name": "Send Notifikasi",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"user_id\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"judul\": \"Pengumuman Penting\",\n    \"pesan\": \"Distribusi bansos akan dimulai pada hari Minggu pukul 10:00 WIB\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/notifikasi/kirim",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "notifikasi", "kirim"]
+            },
+            "description": "Kirim notifikasi manual ke pengguna"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Pengguna",
+      "item": [
+        {
+          "name": "Get Daftar Pengguna",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/pengguna?page=1&limit=20&role=&aktif=",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "pengguna"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "role",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "aktif",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Dapatkan daftar pengguna (filter: role, aktif status)"
+          }
+        },
+        {
+          "name": "Get Detail Pengguna",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/pengguna/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "pengguna", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "user-id-uuid"
+                }
+              ]
+            },
+            "description": "Dapatkan detail pengguna beserta roles dan permissions"
+          }
+        },
+        {
+          "name": "Toggle Status Pengguna",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/pengguna/:id/toggle-aktif",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "pengguna", ":id", "toggle-aktif"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "user-id-uuid"
+                }
+              ]
+            },
+            "description": "Toggle status aktif pengguna (nonaktifkan/aktifkan)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Storage - File Server",
+      "item": [
+        {
+          "name": "Get Foto Rumah",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/storage/foto-rumah/:profil_id/:filename",
+              "host": ["{{base_url}}"],
+              "path": ["api", "storage", "foto-rumah", ":profil_id", ":filename"],
+              "variable": [
+                {
+                  "key": "profil_id",
+                  "value": "profil-id-uuid"
+                },
+                {
+                  "key": "filename",
+                  "value": "tampak_depan_1234567890.jpg"
+                }
+              ]
+            },
+            "description": "Download foto rumah (protected file serve)"
+          }
+        },
+        {
+          "name": "Get QR Code Image",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/storage/qrcode/:profil_id/:filename",
+              "host": ["{{base_url}}"],
+              "path": ["api", "storage", "qrcode", ":profil_id", ":filename"],
+              "variable": [
+                {
+                  "key": "profil_id",
+                  "value": "profil-id-uuid"
+                },
+                {
+                  "key": "filename",
+                  "value": "qr_550e8400-e29b-41d4-a716-446655440002.png"
+                }
+              ]
+            },
+            "description": "Download QR Code image (return image/png)"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    }
+  ]
+}
