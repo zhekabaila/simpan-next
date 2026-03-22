@@ -310,7 +310,8 @@ export default function AdminDashboardPage() {
               <tr className="border-b border-slate-100">
                 <th className="text-left py-2 px-2 text-xs font-semibold text-slate-600">No. Pengajuan</th>
                 <th className="text-left py-2 px-2 text-xs font-semibold text-slate-600">Nama</th>
-                <th className="text-left py-2 px-2 text-xs font-semibold text-slate-600">Tanggal</th>
+                <th className="text-left py-2 px-2 text-xs font-semibold text-slate-600">Diajukan</th>
+                <th className="text-left py-2 px-2 text-xs font-semibold text-slate-600">Reviewer</th>
                 <th className="text-left py-2 px-2 text-xs font-semibold text-slate-600">Status</th>
               </tr>
             </thead>
@@ -319,9 +320,14 @@ export default function AdminDashboardPage() {
                 pengajuan.map((app: any) => (
                   <tr key={app.id} className="border-b border-slate-50 hover:bg-slate-50">
                     <td className="py-3 px-2 font-mono text-xs text-slate-600">{app.nomor_pengajuan || 'N/A'}</td>
-                    <td className="py-3 px-2 text-slate-800">{app.nama_penerima || app.nama || 'N/A'}</td>
+                    <td className="py-3 px-2 text-slate-800 font-medium">
+                      {app.profil?.nama || app.nama_penerima || app.nama || 'N/A'}
+                    </td>
                     <td className="py-3 px-2 text-slate-500 text-xs">
-                      {app.created_at ? new Date(app.created_at).toLocaleDateString('id-ID') : 'N/A'}
+                      {app.diajukan_pada ? new Date(app.diajukan_pada).toLocaleDateString('id-ID') : 'N/A'}
+                    </td>
+                    <td className="py-3 px-2 text-slate-600 text-xs">
+                      {app.reviewer?.nama || (app.ditinjau_pada ? 'Ditinjau' : '-')}
                     </td>
                     <td className="py-3 px-2">
                       <StatusBadge status={app.status || 'menunggu'} />

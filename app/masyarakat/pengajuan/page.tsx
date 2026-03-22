@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { FileText, Plus, Clock, Calendar, AlertCircle } from 'lucide-react'
+import { FileText, Plus, Calendar, AlertCircle, NotebookTabsIcon } from 'lucide-react'
 import useAuthStore from '@/app/_stores/useAuthStore'
 import { masyarakatService } from '@/services/masyarakat'
 import { StatusBadge } from '@/components/core/StatusBadge'
@@ -117,13 +117,13 @@ export default function PengajuanPage() {
             <div className="flex items-center gap-4 text-xs text-slate-400">
               <div className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5" />
-                <span>{new Date(pengajuanStatus.tanggal_pengajuan).toLocaleDateString('id-ID')}</span>
+                <span>{new Date(pengajuanStatus.diajukan_pada).toLocaleDateString('id-ID')}</span>
               </div>
             </div>
             {pengajuanStatus.catatan_admin && (
               <div className="mt-3 p-3 bg-amber-50 rounded-xl">
                 <div className="flex items-center gap-2">
-                  <Clock className="w-3.5 h-3.5 text-amber-600" />
+                  <NotebookTabsIcon className="w-3.5 h-3.5 text-amber-600" />
                   <span className="text-xs text-amber-700 font-medium">{pengajuanStatus.catatan_admin}</span>
                 </div>
               </div>
@@ -151,18 +151,6 @@ export default function PengajuanPage() {
                 })}
               </div>
             </div>
-
-            {/* Action Buttons */}
-            {/* {pengajuanStatus.status === 'menunggu' && (
-              <div className="mt-4 flex gap-2">
-                <button
-                  onClick={handleSubmitPengajuan}
-                  disabled={submitting}
-                  className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm transition-colors disabled:opacity-50">
-                  {submitting ? 'Mengirim...' : 'Kirim Pengajuan'}
-                </button>
-              </div>
-            )} */}
           </div>
         </div>
       )}

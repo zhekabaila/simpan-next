@@ -73,7 +73,7 @@ export const fetchFileToBase64 = async (
 }
 
 export const getNameAliases = (name: string): string => {
-  if (!name) return '';
+  if (!name) return ''
 
   return name
     .split(' ')
@@ -81,5 +81,26 @@ export const getNameAliases = (name: string): string => {
     .slice(0, 2)
     .filter((char) => char)
     .map((char) => char.toUpperCase())
-    .join('');
+    .join('')
+}
+
+export interface PaginationType {
+  limit: number
+  page: number
+  size: number
+  pages: number
+  sort: number
+  order: string
+}
+
+export const getPaginationLabel = (pagination: Omit<PaginationType, "pages" | "sort" | "order"> | null) => {
+  if (pagination) {
+    const { limit, page, size } = pagination
+    const start = page * limit - limit + 1
+    const end = start + limit - 1
+    const finalEnd = size < end ? size : end
+
+    return `Menampilkan ${start} sampai ${finalEnd} dari ${size} baris`
+  }
+  return null
 }

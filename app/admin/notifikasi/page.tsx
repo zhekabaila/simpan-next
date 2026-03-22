@@ -1,9 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Bell, Send, CheckCircle2, QrCode, Calendar, MessageSquare, AlertCircle, X } from 'lucide-react'
 import useAuthStore from '@/app/_stores/useAuthStore'
 import { adminService } from '@/services/admin'
+import { Pagination } from '@/components/shared/pagination'
+import { getPaginationLabel } from '@/lib/utils'
 
 type NotifType = 'semua' | 'status_pengajuan' | 'jadwal_distribusi' | 'qr_siap' | 'umum'
 
@@ -36,8 +39,20 @@ const typeConfig: Record<string, { icon: typeof Bell; bg: string; color: string;
 
 export default function NotifikasiPage() {
   const { token } = useAuthStore()
-  const [filterType, setFilterType] = useState<NotifType>('semua')
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  // Parse URL parameters
+  const pageParam = searchParams.get('page')
+  const limitParam = searchParams.get('limit')
+  const typeParam = searchParams.get('type') as NotifType | null
+
+  const parsedPage = pageParam ? parseInt(pageParam, 10) || 1 : 1
+  const parsedLimit = limitParam ? parseInt(limitParam, 10) || 10 : 10
+  const parsedType = typeParam || 'semua'
+
   const [notifs, setNotifs] = useState<any[]>([])
+  const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [showModal, setShowModal] = useState(false)
@@ -53,9 +68,17 @@ export default function NotifikasiPage() {
 
     const fetchNotifs = async () => {
       try {
-        const result = await adminService.getDaftarNotifikasi(token, 1, 50, filterType !== 'semua' ? filterType : undefined)
+        const result = await adminService.getDaftarNotifikasi(
+          token,
+          parsedPage,
+          parsedLimit,
+          parsedType !== 'semua' ? parsedType : undefined
+        )
         if (result.data) {
           setNotifs(result.data)
+        }
+        if (result.pages) {
+          setTotalPages(result.pages)
         }
       } catch (err: any) {
         setError(err.message)
@@ -64,8 +87,9 @@ export default function NotifikasiPage() {
       }
     }
 
+    setLoading(true)
     fetchNotifs()
-  }, [token, filterType])
+  }, [token, parsedPage, parsedLimit, parsedType])
 
   useEffect(() => {
     if (!token || !showModal) return
@@ -82,6 +106,21 @@ export default function NotifikasiPage() {
     fetchUsers()
   }, [token, showModal])
 
+  // Handler untuk update filter type
+  const handleFilterChange = (type: NotifType) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('type', type)
+    params.set('page', '1') // Reset ke halaman pertama
+    router.replace(`?${params.toString()}`, { scroll: false })
+  }
+
+  // Handler untuk update halaman
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', page.toString())
+    router.replace(`?${params.toString()}`, { scroll: false })
+  }
+
   const handleSendNotif = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!token) return
@@ -90,8 +129,18 @@ export default function NotifikasiPage() {
       setFormData({ user_id: '', judul: '', pesan: '' })
       setShowModal(false)
       // Refresh list
-      const result = await adminService.getDaftarNotifikasi(token, 1, 50, filterType !== 'semua' ? filterType : undefined)
-      if (result.data) setNotifs(result.data)
+      const result = await adminService.getDaftarNotifikasi(
+        token,
+        parsedPage,
+        parsedLimit,
+        parsedType !== 'semua' ? parsedType : undefined
+      )
+      if (result.data) {
+        setNotifs(result.data)
+        if (result.pages) {
+          setTotalPages(result.pages)
+        }
+      }
     } catch (err: any) {
       setError(err.message)
     }
@@ -122,8 +171,6 @@ export default function NotifikasiPage() {
       </div>
     )
   }
-
-  const filtered = notifs.filter((n) => (filterType === 'semua' ? true : n.jenis === filterType))
 
   return (
     <div className="space-y-5">
@@ -159,9 +206,9 @@ export default function NotifikasiPage() {
         ).map((tab) => (
           <button
             key={tab.value}
-            onClick={() => setFilterType(tab.value)}
+            onClick={() => handleFilterChange(tab.value)}
             className={`px-3.5 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all border ${
-              filterType === tab.value
+              parsedType === tab.value
                 ? 'bg-blue-600 text-white border-blue-600'
                 : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
             }`}>
@@ -172,8 +219,8 @@ export default function NotifikasiPage() {
 
       {/* Logs */}
       <div className="space-y-2.5">
-        {filtered.length > 0 ? (
-          filtered.map((notif) => {
+        {notifs.length > 0 ? (
+          notifs.map((notif) => {
             const cfg = typeConfig[notif.jenis] || typeConfig.umum
             const Icon = cfg.icon
             const waktu = notif.created_at ? new Date(notif.created_at).toLocaleString('id-ID') : 'N/A'
@@ -191,12 +238,6 @@ export default function NotifikasiPage() {
                           {cfg.label}
                         </span>
                       </div>
-                      <span
-                        className={`text-xs px-2.5 py-1 rounded-full font-semibold flex-shrink-0 ${
-                          notif.terkirim ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'
-                        }`}>
-                        {notif.terkirim ? 'Terkirim' : 'Gagal'}
-                      </span>
                     </div>
                     <p className="text-sm text-slate-600 mt-1.5 line-clamp-2">{notif.pesan}</p>
                     <div className="flex items-center justify-between mt-2">
@@ -212,6 +253,20 @@ export default function NotifikasiPage() {
           <div className="text-center py-8 text-slate-500 text-sm">Tidak ada notifikasi ditemukan</div>
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && notifs.length > 0 && (
+        <div className="space-y-4">
+          <p className="text-sm text-slate-500">
+            {getPaginationLabel({
+              page: parsedPage,
+              limit: parsedLimit,
+              size: notifs.length
+            })}
+          </p>
+          <Pagination page={parsedPage} pages={totalPages} onPageChange={handlePageChange} />
+        </div>
+      )}
 
       {/* Modal Kirim Notifikasi */}
       {showModal && (

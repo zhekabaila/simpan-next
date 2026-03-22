@@ -1,16 +1,30 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Plus, Trash2 } from 'lucide-react'
 import useAuthStore from '@/app/_stores/useAuthStore'
 import { adminService } from '@/services/admin'
+import { Pagination } from '@/components/shared/pagination'
 import { CreateAssignmentDialog } from '@/components/dialogs/create-assignment-dialog'
 import { StatusBadge } from '@/components/core/StatusBadge'
+import { getPaginationLabel } from '@/lib/utils'
 import { toast } from 'sonner'
 
 export default function PenugasanPage() {
   const { token } = useAuthStore()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  // Parse URL parameters
+  const pageParam = searchParams.get('page')
+  const limitParam = searchParams.get('limit')
+
+  const parsedPage = pageParam ? parseInt(pageParam, 10) || 1 : 1
+  const parsedLimit = limitParam ? parseInt(limitParam, 10) || 10 : 10
+
   const [assignments, setAssignments] = useState<any[]>([])
+  const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(true)
   const [showDialog, setShowDialog] = useState(false)
   const [petugasList, setPetugasList] = useState<any[]>([])
@@ -21,9 +35,12 @@ export default function PenugasanPage() {
 
     const fetchAssignments = async () => {
       try {
-        const result = await adminService.getDaftarPenugasan(token, 1, 100)
+        const result = await adminService.getDaftarPenugasan(token, parsedPage, parsedLimit)
         if (result.data) {
           setAssignments(result.data)
+        }
+        if (result.pages) {
+          setTotalPages(result.pages)
         }
       } catch (err: any) {
         toast.error(err.message)
@@ -32,8 +49,9 @@ export default function PenugasanPage() {
       }
     }
 
+    setLoading(true)
     fetchAssignments()
-  }, [token])
+  }, [token, parsedPage, parsedLimit])
 
   useEffect(() => {
     if (!token || !showDialog) return
@@ -54,14 +72,26 @@ export default function PenugasanPage() {
     fetchData()
   }, [token, showDialog])
 
+  // Handler untuk update halaman
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', page.toString())
+    router.replace(`?${params.toString()}`, { scroll: false })
+  }
+
   const handleCreateAssignment = async (data: any) => {
     if (!token) return
     try {
       await adminService.createPenugasan(token, data)
 
       // Refresh list
-      const result = await adminService.getDaftarPenugasan(token, 1, 100)
-      if (result.data) setAssignments(result.data)
+      const result = await adminService.getDaftarPenugasan(token, parsedPage, parsedLimit)
+      if (result.data) {
+        setAssignments(result.data)
+        if (result.pages) {
+          setTotalPages(result.pages)
+        }
+      }
     } catch (err: any) {
       toast.error(err.message)
       throw err
@@ -76,8 +106,13 @@ export default function PenugasanPage() {
       await adminService.deletePenugasan(token, id)
       toast.success('Penugasan berhasil dihapus!', { duration: 2000 })
       // Refresh list
-      const result = await adminService.getDaftarPenugasan(token, 1, 100)
-      if (result.data) setAssignments(result.data)
+      const result = await adminService.getDaftarPenugasan(token, parsedPage, parsedLimit)
+      if (result.data) {
+        setAssignments(result.data)
+        if (result.pages) {
+          setTotalPages(result.pages)
+        }
+      }
     } catch (err: any) {
       const errorMsg = err.message || 'Gagal menghapus penugasan'
       toast.error('Gagal menghapus penugasan', { description: errorMsg, duration: 3000 })
@@ -184,6 +219,20 @@ export default function PenugasanPage() {
           </table>
         </div>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && assignments.length > 0 && (
+        <div className="space-y-4">
+          <p className="text-sm text-slate-500">
+            {getPaginationLabel({
+              page: parsedPage,
+              limit: parsedLimit,
+              size: assignments.length
+            })}
+          </p>
+          <Pagination page={parsedPage} pages={totalPages} onPageChange={handlePageChange} />
+        </div>
+      )}
 
       {/* Create Assignment Dialog */}
       <CreateAssignmentDialog

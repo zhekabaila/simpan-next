@@ -157,25 +157,9 @@ export function LocationViewer({ markers = [], lat = -6.2, long = 106.8, singleM
   }
 
   return (
-    <div className="space-y-3">
-      {/* Statistics */}
-      {markers && markers.length > 0 && (
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-green-50 rounded-lg p-3 border border-green-100">
-            <p className="text-xs text-green-700 font-semibold">Sudah Menerima</p>
-            <p className="text-lg font-bold text-green-600">{markers.filter((m) => m.status === 'sudah_menerima').length}</p>
-          </div>
-          <div className="bg-orange-50 rounded-lg p-3 border border-orange-100">
-            <p className="text-xs text-orange-700 font-semibold">Belum Menerima</p>
-            <p className="text-lg font-bold text-orange-600">
-              {markers.filter((m) => m.status === 'belum_menerima').length}
-            </p>
-          </div>
-        </div>
-      )}
-
+    <div className="space-y-3 z-0">
       {/* Map */}
-      <div className="w-full aspect-video rounded-lg overflow-hidden border border-slate-200 relative shadow-sm">
+      <div className="w-full aspect-video rounded-lg overflow-hidden border border-slate-200 relative shadow-sm z-0">
         <MapContainer
           center={[coordinates.lat, coordinates.lng]}
           zoom={calculateZoom}

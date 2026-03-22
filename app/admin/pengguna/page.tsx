@@ -1,9 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Search, UserPlus, MoreVertical, Shield, HardHat, Users, AlertCircle } from 'lucide-react'
+import { Pagination } from '@/components/shared/pagination'
 import useAuthStore from '@/app/_stores/useAuthStore'
 import { adminService } from '@/services/admin'
+import { getPaginationLabel } from '@/lib/utils'
+import { CreateUserDialog } from '@/components/dialogs/create-user-dialog'
+import { toast } from 'sonner'
 
 type Role = 'semua' | 'masyarakat' | 'petugas' | 'admin'
 
@@ -30,26 +35,43 @@ const roleConfig = {
 
 export default function PenggunaPage() {
   const { token } = useAuthStore()
-  const [search, setSearch] = useState('')
-  const [filterRole, setFilterRole] = useState<Role>('semua')
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  // Parse URL parameters
+  const pageParam = searchParams.get('page')
+  const limitParam = searchParams.get('limit')
+  const qParam = searchParams.get('q') || ''
+  const roleParam = searchParams.get('role') as Role | null
+
+  const parsedPage = pageParam ? parseInt(pageParam, 10) || 1 : 1
+  const parsedLimit = limitParam ? parseInt(limitParam, 10) || 10 : 10
+  const parsedRole = roleParam || 'semua'
+
   const [users, setUsers] = useState<any[]>([])
+  const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [userCount, setUserCount] = useState({
-    semua: 0,
-    petugas: 0,
-    masyarakat: 0,
-    admin: 0
-  })
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
 
+  // Fetch users
   useEffect(() => {
     if (!token) return
 
     const fetchUsers = async () => {
       try {
-        const result = await adminService.getDaftarPengguna(token, 1, 100, filterRole !== 'semua' ? filterRole : undefined)
+        const result = await adminService.getDaftarPengguna(
+          token,
+          parsedPage,
+          parsedLimit,
+          parsedRole !== 'semua' ? parsedRole : undefined
+          // qParam || undefined
+        )
         if (result.data) {
           setUsers(result.data)
+        }
+        if (result.pages) {
+          setTotalPages(result.pages)
         }
       } catch (err: any) {
         setError(err.message)
@@ -58,54 +80,75 @@ export default function PenggunaPage() {
       }
     }
 
+    setLoading(true)
     fetchUsers()
-  }, [token, filterRole])
+  }, [token, parsedPage, parsedLimit, parsedRole, qParam])
 
-  useEffect(() => {
-    if (!token) return
+  // Handler untuk update filter role
+  const handleFilterChange = (role: Role) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('role', role)
+    params.set('page', '1') // Reset ke halaman pertama
+    router.replace(`?${params.toString()}`, { scroll: false })
+  }
 
-    const fetchAllUserCounts = async () => {
-      setLoading(true)
-      try {
-        const roles = ['semua', 'petugas', 'admin', 'masyarakat']
-        const countPromises = roles.map((role) => {
-          adminService
-            .getDaftarPengguna(token, 1, 100, role !== 'semua' ? role : undefined)
-            .then((result) => {
-              console.log(role, result)
-              setUserCount((e) => {
-                return {
-                  ...e,
-                  [role]: result.size
-                }
-              })
-            })
-            .catch((err) => {
-              console.error(`Failed to fetch count for ${role}:`, err)
-              return { role, count: 0 }
-            })
-        })
-
-        await Promise.all(countPromises)
-      } catch (err: any) {
-        setError(err.message)
-      } finally {
-        setLoading(false)
-      }
+  // Handler untuk update search
+  const handleSearchChange = (value: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (value) {
+      params.set('q', value)
+    } else {
+      params.delete('q')
     }
+    params.set('page', '1') // Reset ke halaman pertama
+    router.replace(`?${params.toString()}`, { scroll: false })
+  }
 
-    fetchAllUserCounts()
-  }, [token])
+  // Handler untuk update halaman
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', page.toString())
+    router.replace(`?${params.toString()}`, { scroll: false })
+  }
 
   const handleToggleStatus = async (userId: string) => {
     if (!token) return
     try {
       await adminService.toggleStatusPengguna(token, userId)
       // Refresh list
-      const result = await adminService.getDaftarPengguna(token, 1, 100, filterRole !== 'semua' ? filterRole : undefined)
+      const result = await adminService.getDaftarPengguna(
+        token,
+        parsedPage,
+        parsedLimit,
+        parsedRole !== 'semua' ? parsedRole : undefined
+        // qParam || undefined
+      )
       if (result.data) setUsers(result.data)
     } catch (err: any) {
-      setError(err.message)
+      toast.error(err.message || 'Gagal mengubah status')
+    }
+  }
+
+  const handleCreateUser = async (data: any) => {
+    if (!token) return
+    try {
+      await adminService.registerUserByAdmin(token, {
+        ...data,
+        role: 'masyarakat'
+      })
+      toast.success('Pengguna berhasil ditambahkan')
+      // Refresh list
+      const result = await adminService.getDaftarPengguna(
+        token,
+        parsedPage,
+        parsedLimit,
+        parsedRole !== 'semua' ? parsedRole : undefined
+        // qParam || undefined
+      )
+      if (result.data) setUsers(result.data)
+    } catch (err: any) {
+      toast.error(err.message || 'Gagal menambah pengguna')
+      throw err
     }
   }
 
@@ -135,12 +178,6 @@ export default function PenggunaPage() {
     )
   }
 
-  const filtered = users.filter((u) => {
-    const matchSearch =
-      u.nama?.toLowerCase().includes(search.toLowerCase()) || u.email?.toLowerCase().includes(search.toLowerCase())
-    return matchSearch
-  })
-
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
@@ -148,6 +185,12 @@ export default function PenggunaPage() {
           <h1 className="text-xl font-bold text-slate-800">Manajemen Pengguna</h1>
           <p className="text-sm text-slate-500">Kelola akun Masyarakat, Petugas, dan Admin</p>
         </div>
+        <button
+          onClick={() => setIsCreateDialogOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-colors">
+          <UserPlus className="w-4 h-4" />
+          Tambah Pengguna
+        </button>
       </div>
 
       {/* Filter Tabs */}
@@ -155,9 +198,9 @@ export default function PenggunaPage() {
         {(['semua', 'masyarakat', 'petugas', 'admin'] as Role[]).map((r) => (
           <button
             key={r}
-            onClick={() => setFilterRole(r)}
+            onClick={() => handleFilterChange(r)}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all border ${
-              filterRole === r
+              parsedRole === r
                 ? 'bg-blue-600 text-white border-blue-600'
                 : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
             }`}>
@@ -165,12 +208,6 @@ export default function PenggunaPage() {
               {r === 'semua'
                 ? 'Semua'
                 : (roleConfig[r as keyof typeof roleConfig] as (typeof roleConfig)[keyof typeof roleConfig])?.label}
-            </span>
-            <span
-              className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${
-                filterRole === r ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
-              }`}>
-              {userCount?.[r]}
             </span>
           </button>
         ))}
@@ -181,8 +218,8 @@ export default function PenggunaPage() {
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
         <input
           type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={qParam}
+          onChange={(e) => handleSearchChange(e.target.value)}
           placeholder="Cari nama atau email..."
           className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition shadow-sm"
         />
@@ -203,8 +240,8 @@ export default function PenggunaPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {filtered.length > 0 ? (
-                filtered.map((user) => {
+              {users.length > 0 ? (
+                users.map((user) => {
                   const roleCfg = roleConfig[user.role as keyof typeof roleConfig]
                   const RoleIcon = roleCfg.icon
                   const bergabung = user.created_at ? new Date(user.created_at).toLocaleDateString('id-ID') : 'N/A'
@@ -258,6 +295,22 @@ export default function PenggunaPage() {
           </table>
         </div>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && users.length > 0 && (
+        <div className="flex items-center justify-between gap-4">
+          <p className="text-sm text-slate-500 whitespace-nowrap">
+            {getPaginationLabel({
+              page: parsedPage,
+              limit: parsedLimit,
+              size: users.length
+            })}
+          </p>
+          <Pagination page={parsedPage} pages={totalPages} onPageChange={handlePageChange} />
+        </div>
+      )}
+
+      <CreateUserDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen} onSubmit={handleCreateUser} />
     </div>
   )
 }

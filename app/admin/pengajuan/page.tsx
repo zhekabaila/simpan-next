@@ -1,34 +1,38 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { Search, Download, ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Search, Download } from 'lucide-react'
+import { Pagination } from '@/components/shared/pagination'
 import { StatusBadge } from '@/components/core/StatusBadge'
 import useAuthStore from '@/app/_stores/useAuthStore'
 import { adminService } from '@/services/admin'
+import { getPaginationLabel } from '@/lib/utils'
 import { toast } from 'sonner'
 
 type FilterStatus = 'semua' | 'menunggu' | 'ditinjau' | 'disetujui' | 'ditolak'
 
 export default function DaftarPengajuanPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { token } = useAuthStore()
-  const [search, setSearch] = useState('')
-  const [filterStatus, setFilterStatus] = useState<FilterStatus>('semua')
-  const [currentPage, setCurrentPage] = useState(1)
+
+  // Parse URL parameters
+  const pageParam = searchParams.get('page')
+  const limitParam = searchParams.get('limit')
+  const qParam = searchParams.get('q') || ''
+  const statusParam = searchParams.get('status') as FilterStatus | null
+
+  const parsedPage = pageParam ? parseInt(pageParam, 10) || 1 : 1
+  const parsedLimit = limitParam ? parseInt(limitParam, 10) || 10 : 10
+  const parsedStatus = statusParam || 'semua'
+
   const [pengajuanData, setPengajuanData] = useState<any[]>([])
   const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [pengajuanCount, setPengajuanCount] = useState({
-    semua: 0,
-    menunggu: 0,
-    ditinjau: 0,
-    disetujui: 0,
-    ditolak: 0
-  })
-  const itemsPerPage = 10
 
+  // Fetch pengajuan data
   useEffect(() => {
     if (!token) return
 
@@ -36,18 +40,18 @@ export default function DaftarPengajuanPage() {
       try {
         const result = await adminService.getDaftarPengajuan(
           token,
-          currentPage,
-          itemsPerPage,
-          filterStatus !== 'semua' ? filterStatus : undefined,
-          search || undefined
+          parsedPage,
+          parsedLimit,
+          parsedStatus !== 'semua' ? parsedStatus : undefined,
+          qParam || undefined
         )
 
         if (result.data) {
           setPengajuanData(result.data)
         }
 
-        if (result.pagination) {
-          setTotalPages(Math.ceil(result.pagination.total / itemsPerPage))
+        if (result.pages) {
+          setTotalPages(result.pages)
         }
       } catch (err: any) {
         setError(err.message)
@@ -58,58 +62,34 @@ export default function DaftarPengajuanPage() {
 
     setLoading(true)
     fetchPengajuan()
-  }, [token, currentPage, filterStatus, search])
+  }, [token, parsedPage, parsedLimit, parsedStatus, qParam])
 
-  useEffect(() => {
-    if (!token) return
-
-    const fetchAllPengajuanCounts = async () => {
-      try {
-        const statuses = ['semua', 'menunggu', 'ditinjau', 'disetujui', 'ditolak'] as const
-        const countPromises = statuses.map((status) =>
-          adminService
-            .getDaftarPengajuan(token, 1, 100, status !== 'semua' ? (status as FilterStatus) : undefined)
-            .then((result) => {
-              setPengajuanCount((prev) => ({
-                ...prev,
-                [status]: result.pagination?.total || result.data?.length || 0
-              }))
-            })
-            .catch((err) => {
-              console.error(`Failed to fetch count for ${status}:`, err)
-            })
-        )
-
-        await Promise.all(countPromises)
-      } catch (err: any) {
-        console.error('Failed to fetch pengajuan counts:', err.message)
-      }
-    }
-
-    fetchAllPengajuanCounts()
-  }, [token])
-
-  if (error) {
-    return (
-      <div className="space-y-5">
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-5 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="font-semibold text-red-900">Error</p>
-            <p className="text-sm text-red-700 mt-1">{error}</p>
-          </div>
-        </div>
-      </div>
-    )
+  // Handler untuk update filter status
+  const handleFilterChange = (status: FilterStatus) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('status', status)
+    params.set('page', '1') // Reset ke halaman pertama
+    router.replace(`?${params.toString()}`, { scroll: false })
   }
 
-  const filtered = pengajuanData.filter((item) => {
-    const matchSearch =
-      item.nomor_pengajuan?.toLowerCase().includes(search.toLowerCase()) ||
-      item.profil?.nik?.includes(search) ||
-      item.profil?.nama?.toLowerCase().includes(search.toLowerCase())
-    return matchSearch
-  })
+  // Handler untuk update search
+  const handleSearchChange = (value: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (value) {
+      params.set('q', value)
+    } else {
+      params.delete('q')
+    }
+    params.set('page', '1') // Reset ke halaman pertama
+    router.replace(`?${params.toString()}`, { scroll: false })
+  }
+
+  // Handler untuk update halaman
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', page.toString())
+    router.replace(`?${params.toString()}`, { scroll: false })
+  }
 
   const handleTinjau = async (id: any) => {
     if (!token) return
@@ -165,22 +145,13 @@ export default function DaftarPengajuanPage() {
         ).map((tab) => (
           <button
             key={tab.value}
-            onClick={() => {
-              setFilterStatus(tab.value)
-              setCurrentPage(1)
-            }}
+            onClick={() => handleFilterChange(tab.value)}
             className={`px-3.5 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all border ${
-              filterStatus === tab.value
+              parsedStatus === tab.value
                 ? 'bg-blue-600 text-white border-blue-600'
                 : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
             }`}>
             {tab.label}
-            <span
-              className={`ml-2 text-xs px-1.5 py-0.5 rounded-full font-bold ${
-                filterStatus === tab.value ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
-              }`}>
-              {pengajuanCount?.[tab.value]}
-            </span>
           </button>
         ))}
       </div>
@@ -190,11 +161,8 @@ export default function DaftarPengajuanPage() {
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
         <input
           type="text"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value)
-            setCurrentPage(1)
-          }}
+          value={qParam}
+          onChange={(e) => handleSearchChange(e.target.value)}
           placeholder="Cari nama, NIK, atau no. pengajuan..."
           className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition shadow-sm"
         />
@@ -215,14 +183,14 @@ export default function DaftarPengajuanPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {filtered.length === 0 ? (
+              {pengajuanData.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-12 text-center">
                     <p className="text-slate-500">Tidak ada data pengajuan</p>
                   </td>
                 </tr>
               ) : (
-                filtered.map((item) => {
+                pengajuanData.map((item) => {
                   const tanggal = new Date(item.diajukan_pada).toLocaleDateString('id-ID', {
                     year: 'numeric',
                     month: 'short',
@@ -257,24 +225,15 @@ export default function DaftarPengajuanPage() {
 
       {/* Pagination */}
       {totalPages > 1 && pengajuanData.length > 0 && (
-        <div className="flex items-center justify-between">
+        <div className="space-y-4">
           <p className="text-sm text-slate-500">
-            Halaman {currentPage} dari {totalPages}
+            {getPaginationLabel({
+              page: parsedPage,
+              limit: parsedLimit,
+              size: pengajuanData.length
+            })}
           </p>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-              disabled={currentPage === 1}
-              className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-              <ChevronLeft className="w-4 h-4 text-slate-600" />
-            </button>
-            <button
-              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-              disabled={currentPage === totalPages}
-              className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-              <ChevronRight className="w-4 h-4 text-slate-600" />
-            </button>
-          </div>
+          <Pagination page={parsedPage} pages={totalPages} onPageChange={handlePageChange} />
         </div>
       )}
     </div>

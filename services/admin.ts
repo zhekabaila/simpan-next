@@ -115,8 +115,6 @@ export const adminService = {
     data: {
       nama_periode: string
       jenis_bantuan: string
-      tanggal_mulai: string
-      tanggal_selesai: string
     }
   ): Promise<any> {
     try {
@@ -373,6 +371,42 @@ export const adminService = {
       return response.data
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to toggle pengguna status')
+    }
+  },
+
+  async registerUserByAdmin(
+    token: string,
+    data: {
+      nama: string
+      email: string
+      password: string
+      nik: string
+      nomor_telepon: string
+      tanggal_lahir: string
+      jenis_kelamin: string
+      alamat: string
+      rt: string
+      rw: string
+      kelurahan: string
+      kecamatan: string
+      kota: string
+      provinsi: string
+      status_pernikahan: string
+      jumlah_tanggungan: number
+      status_pekerjaan: string
+      penghasilan_bulanan: number
+      status_kepemilikan_rumah: string
+      latitude: number
+      longitude: number
+    }
+  ): Promise<any> {
+    try {
+      const response = await API.post('/admin/pengguna/registrasi-by-admin', data, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      return response.data
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to registrasi-by-admin')
     }
   }
 }

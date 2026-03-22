@@ -1,0 +1,483 @@
+'use client'
+
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog'
+import { LocationPicker } from '@/components/core/location-picker'
+import { useState } from 'react'
+import { AlertCircle } from 'lucide-react'
+
+interface FormData {
+  nama: string
+  email: string
+  password: string
+  nik: string
+  nomor_telepon: string
+  tanggal_lahir: string
+  jenis_kelamin: string
+  alamat: string
+  rt: string
+  rw: string
+  kelurahan: string
+  kecamatan: string
+  kota: string
+  provinsi: string
+  status_pernikahan: string
+  jumlah_tanggungan: number
+  status_pekerjaan: string
+  penghasilan_bulanan: number
+  status_kepemilikan_rumah: string
+  latitude: number
+  longitude: number
+}
+
+interface CreateUserDialogProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onSubmit: (data: FormData) => Promise<void>
+}
+
+export function CreateUserDialog({ open, onOpenChange, onSubmit }: CreateUserDialogProps) {
+  const [formData, setFormData] = useState<FormData>({
+    nama: '',
+    email: '',
+    password: '',
+    nik: '',
+    nomor_telepon: '',
+    tanggal_lahir: '',
+    jenis_kelamin: '',
+    alamat: '',
+    rt: '',
+    rw: '',
+    kelurahan: '',
+    kecamatan: '',
+    kota: '',
+    provinsi: '',
+    status_pernikahan: '',
+    jumlah_tanggungan: 0,
+    status_pekerjaan: '',
+    penghasilan_bulanan: 0,
+    status_kepemilikan_rumah: '',
+    latitude: 0,
+    longitude: 0
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleSubmit = async () => {
+    // Validate required fields
+    if (!formData.nama || !formData.email || !formData.password || !formData.nik) {
+      setError('Mohon lengkapi semua field yang diperlukan (*)')
+      return
+    }
+
+    setIsSubmitting(true)
+    setError('')
+    try {
+      await onSubmit(formData)
+      // Reset form after success
+      setFormData({
+        nama: '',
+        email: '',
+        password: '',
+        nik: '',
+        nomor_telepon: '',
+        tanggal_lahir: '',
+        jenis_kelamin: '',
+        alamat: '',
+        rt: '',
+        rw: '',
+        kelurahan: '',
+        kecamatan: '',
+        kota: '',
+        provinsi: '',
+        status_pernikahan: '',
+        jumlah_tanggungan: 0,
+        status_pekerjaan: '',
+        penghasilan_bulanan: 0,
+        status_kepemilikan_rumah: '',
+        latitude: 0,
+        longitude: 0
+      })
+      setError('')
+      // Auto-close after success
+      setTimeout(() => {
+        onOpenChange(false)
+      }, 1500)
+    } catch (err: any) {
+      setError(err.message || 'Gagal menambah pengguna')
+      // Stay open so user can see error
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleCancel = () => {
+    // Always allow user to cancel with Batal button
+    setFormData({
+      nama: '',
+      email: '',
+      password: '',
+      nik: '',
+      nomor_telepon: '',
+      tanggal_lahir: '',
+      jenis_kelamin: '',
+      alamat: '',
+      rt: '',
+      rw: '',
+      kelurahan: '',
+      kecamatan: '',
+      kota: '',
+      provinsi: '',
+      status_pernikahan: '',
+      jumlah_tanggungan: 0,
+      status_pekerjaan: '',
+      penghasilan_bulanan: 0,
+      status_kepemilikan_rumah: '',
+      latitude: 0,
+      longitude: 0
+    })
+    setError('')
+    onOpenChange(false)
+  }
+
+  const handleOpenChange = (newOpen: boolean) => {
+    // Prevent closing if there's an error displayed (from outside clicks, not from Batal button)
+    if (newOpen === false && error) {
+      return
+    }
+    onOpenChange(newOpen)
+  }
+
+  const handleLocationChange = (value: { lat: number; long: number; address: string }) => {
+    setFormData((prev) => ({
+      ...prev,
+      latitude: value.lat,
+      longitude: value.long,
+      alamat: value.address
+    }))
+  }
+
+  return (
+    <AlertDialog open={open} onOpenChange={handleOpenChange}>
+      <AlertDialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <AlertDialogHeader>
+          <AlertDialogTitle>Tambah Pengguna Baru</AlertDialogTitle>
+          <AlertDialogDescription>
+            Daftarkan masyarakat baru ke sistem untuk mendapatkan bantuan sosial
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex gap-2">
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-red-700">{error}</p>
+          </div>
+        )}
+
+        <div className="space-y-4 py-4 max-h-[calc(90vh-300px)] overflow-y-auto">
+          {/* Authentication Section */}
+          <div className="border-b border-slate-200 pb-4">
+            <h3 className="text-sm font-semibold text-slate-700 mb-3">Informasi Akun</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-semibold text-slate-600 block mb-1">
+                  Email <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="email@example.com"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-600 block mb-1">
+                  Password <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  placeholder="Minimal 8 karakter"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={isSubmitting}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Personal Data Section */}
+          <div className="border-b border-slate-200 pb-4">
+            <h3 className="text-sm font-semibold text-slate-700 mb-3">Data Diri</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-semibold text-slate-600 block mb-1">
+                  Nama Lengkap <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.nama}
+                  onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
+                  placeholder="Nama lengkap"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-600 block mb-1">
+                  NIK (16 digit) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  maxLength={16}
+                  value={formData.nik}
+                  onChange={(e) => setFormData({ ...formData, nik: e.target.value })}
+                  placeholder="3201234567890123"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-slate-600 block mb-1">Tanggal Lahir</label>
+                  <input
+                    type="date"
+                    value={formData.tanggal_lahir}
+                    onChange={(e) => setFormData({ ...formData, tanggal_lahir: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-slate-600 block mb-1">Jenis Kelamin</label>
+                  <select
+                    value={formData.jenis_kelamin}
+                    onChange={(e) => setFormData({ ...formData, jenis_kelamin: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={isSubmitting}>
+                    <option value="">Pilih</option>
+                    <option value="L">Laki-laki</option>
+                    <option value="P">Perempuan</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-slate-600 block mb-1">Status Pernikahan</label>
+                  <select
+                    value={formData.status_pernikahan}
+                    onChange={(e) => setFormData({ ...formData, status_pernikahan: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={isSubmitting}>
+                    <option value="">Pilih</option>
+                    <option value="belum_menikah">Belum Menikah</option>
+                    <option value="menikah">Menikah</option>
+                    <option value="cerai_hidup">Cerai Hidup</option>
+                    <option value="cerai_mati">Cerai Mati</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-slate-600 block mb-1">Jumlah Tanggungan</label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={formData.jumlah_tanggungan}
+                    onChange={(e) => setFormData({ ...formData, jumlah_tanggungan: parseInt(e.target.value) || 0 })}
+                    placeholder="0"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={isSubmitting}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-600 block mb-1">Nomor Telepon</label>
+                <input
+                  type="tel"
+                  value={formData.nomor_telepon}
+                  onChange={(e) => setFormData({ ...formData, nomor_telepon: e.target.value })}
+                  placeholder="08xx xxxx xxxx"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={isSubmitting}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Economic Section */}
+          <div className="border-b border-slate-200 pb-4">
+            <h3 className="text-sm font-semibold text-slate-700 mb-3">Kondisi Ekonomi</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-semibold text-slate-600 block mb-1">Status Pekerjaan</label>
+                <select
+                  value={formData.status_pekerjaan}
+                  onChange={(e) => setFormData({ ...formData, status_pekerjaan: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={isSubmitting}>
+                  <option value="">Pilih</option>
+                  <option value="tidak_bekerja">Tidak Bekerja</option>
+                  <option value="petani">Petani</option>
+                  <option value="pedagang">Pedagang</option>
+                  <option value="karyawan_swasta">Karyawan Swasta</option>
+                  <option value="karyawan_negeri">Karyawan Negeri</option>
+                  <option value="pekerja_lepas">Pekerja Lepas</option>
+                  <option value="lainnya">Lainnya</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-600 block mb-1">Penghasilan Bulanan</label>
+                <input
+                  type="number"
+                  min={0}
+                  value={formData.penghasilan_bulanan}
+                  onChange={(e) => setFormData({ ...formData, penghasilan_bulanan: parseInt(e.target.value) || 0 })}
+                  placeholder="Contoh: 1500000"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-600 block mb-1">Status Kepemilikan Rumah</label>
+                <select
+                  value={formData.status_kepemilikan_rumah}
+                  onChange={(e) => setFormData({ ...formData, status_kepemilikan_rumah: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={isSubmitting}>
+                  <option value="">Pilih</option>
+                  <option value="milik_sendiri">Milik Sendiri</option>
+                  <option value="kontrak_sewa">Kontrak/Sewa</option>
+                  <option value="milik_orang_tua">Milik Orang Tua</option>
+                  <option value="menumpang">Menumpang</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Address Section */}
+          <div>
+            <h3 className="text-sm font-semibold text-slate-700 mb-3">Lokasi Rumah</h3>
+            <div className="space-y-3">
+              <LocationPicker
+                value={{
+                  lat: formData.latitude,
+                  long: formData.longitude,
+                  address: formData.alamat
+                }}
+                onChange={handleLocationChange}
+                addressPlaceholder="Cari alamat rumah..."
+              />
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-slate-600 block mb-1">RT</label>
+                  <input
+                    type="text"
+                    value={formData.rt}
+                    onChange={(e) => setFormData({ ...formData, rt: e.target.value })}
+                    placeholder="02"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-slate-600 block mb-1">RW</label>
+                  <input
+                    type="text"
+                    value={formData.rw}
+                    onChange={(e) => setFormData({ ...formData, rw: e.target.value })}
+                    placeholder="05"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={isSubmitting}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-600 block mb-1">Kelurahan</label>
+                <input
+                  type="text"
+                  value={formData.kelurahan}
+                  onChange={(e) => setFormData({ ...formData, kelurahan: e.target.value })}
+                  placeholder="Kebon Jeruk"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-600 block mb-1">Kecamatan</label>
+                <input
+                  type="text"
+                  value={formData.kecamatan}
+                  onChange={(e) => setFormData({ ...formData, kecamatan: e.target.value })}
+                  placeholder="Kebon Jeruk"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-slate-600 block mb-1">Kota/Kabupaten</label>
+                  <input
+                    type="text"
+                    value={formData.kota}
+                    onChange={(e) => setFormData({ ...formData, kota: e.target.value })}
+                    placeholder="Jakarta Barat"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-slate-600 block mb-1">Provinsi</label>
+                  <input
+                    type="text"
+                    value={formData.provinsi}
+                    onChange={(e) => setFormData({ ...formData, provinsi: e.target.value })}
+                    placeholder="DKI Jakarta"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={isSubmitting}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <AlertDialogFooter>
+          <button
+            onClick={handleCancel}
+            disabled={isSubmitting}
+            className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Batal
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            {isSubmitting ? 'Menyimpan...' : 'Tambah Pengguna'}
+          </button>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}

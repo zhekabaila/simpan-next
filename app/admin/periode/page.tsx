@@ -1,15 +1,29 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Calendar, Plus, AlertCircle, Edit2, Trash2, Check, X } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Plus, AlertCircle, Edit2, Trash2, Check, X } from 'lucide-react'
 import { toast } from 'sonner'
+import { Pagination } from '@/components/shared/pagination'
 import { StatusBadge } from '@/components/core/StatusBadge'
 import useAuthStore from '@/app/_stores/useAuthStore'
 import { adminService } from '@/services/admin'
+import { getPaginationLabel } from '@/lib/utils'
 
 export default function PeriodePage() {
   const { token } = useAuthStore()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  // Parse URL parameters
+  const pageParam = searchParams.get('page')
+  const limitParam = searchParams.get('limit')
+
+  const parsedPage = pageParam ? parseInt(pageParam, 10) || 1 : 1
+  const parsedLimit = limitParam ? parseInt(limitParam, 10) || 10 : 10
+
   const [periods, setPeriods] = useState<any[]>([])
+  const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [showForm, setShowForm] = useState(false)
@@ -17,9 +31,7 @@ export default function PeriodePage() {
   const [editingStatus, setEditingStatus] = useState<string>('')
   const [formData, setFormData] = useState({
     nama_periode: '',
-    jenis_bantuan: '',
-    tanggal_mulai: '',
-    tanggal_selesai: ''
+    jenis_bantuan: ''
   })
 
   useEffect(() => {
@@ -27,9 +39,12 @@ export default function PeriodePage() {
 
     const fetchPeriodes = async () => {
       try {
-        const result = await adminService.getDaftarPeriode(token, 1, 50)
+        const result = await adminService.getDaftarPeriode(token, parsedPage, parsedLimit)
         if (result.data) {
           setPeriods(result.data)
+        }
+        if (result.pages) {
+          setTotalPages(result.pages)
         }
       } catch (err: any) {
         setError(err.message)
@@ -38,8 +53,16 @@ export default function PeriodePage() {
       }
     }
 
+    setLoading(true)
     fetchPeriodes()
-  }, [token])
+  }, [token, parsedPage, parsedLimit])
+
+  // Handler untuk update halaman
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', page.toString())
+    router.replace(`?${params.toString()}`, { scroll: false })
+  }
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -48,11 +71,16 @@ export default function PeriodePage() {
     try {
       await adminService.createPeriode(token, formData)
       toast.success('Periode berhasil dibuat!', { duration: 2000 })
-      setFormData({ nama_periode: '', jenis_bantuan: '', tanggal_mulai: '', tanggal_selesai: '' })
+      setFormData({ nama_periode: '', jenis_bantuan: '' })
       setShowForm(false)
       // Refresh list
-      const result = await adminService.getDaftarPeriode(token, 1, 50)
-      if (result.data) setPeriods(result.data)
+      const result = await adminService.getDaftarPeriode(token, parsedPage, parsedLimit)
+      if (result.data) {
+        setPeriods(result.data)
+        if (result.pages) {
+          setTotalPages(result.pages)
+        }
+      }
     } catch (err: any) {
       const errorMsg = err.message || 'Gagal membuat periode'
       setError(errorMsg)
@@ -75,8 +103,13 @@ export default function PeriodePage() {
       setEditingId(null)
       setEditingStatus('')
       // Refresh list
-      const result = await adminService.getDaftarPeriode(token, 1, 50)
-      if (result.data) setPeriods(result.data)
+      const result = await adminService.getDaftarPeriode(token, parsedPage, parsedLimit)
+      if (result.data) {
+        setPeriods(result.data)
+        if (result.pages) {
+          setTotalPages(result.pages)
+        }
+      }
     } catch (err: any) {
       const errorMsg = err.message || 'Gagal mengubah status'
       toast.error('Gagal mengubah status', { description: errorMsg, duration: 3000 })
@@ -91,8 +124,13 @@ export default function PeriodePage() {
       await adminService.deletePeriode(token, id)
       toast.success('Periode berhasil dihapus!', { duration: 2000 })
       // Refresh list
-      const result = await adminService.getDaftarPeriode(token, 1, 50)
-      if (result.data) setPeriods(result.data)
+      const result = await adminService.getDaftarPeriode(token, parsedPage, parsedLimit)
+      if (result.data) {
+        setPeriods(result.data)
+        if (result.pages) {
+          setTotalPages(result.pages)
+        }
+      }
     } catch (err: any) {
       const errorMsg = err.message || 'Gagal menghapus periode'
       toast.error('Gagal menghapus periode', { description: errorMsg, duration: 3000 })
@@ -171,28 +209,6 @@ export default function PeriodePage() {
                 <option value="lainnya">Lainnya</option>
               </select>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-sm font-semibold text-slate-700">Tanggal Mulai</label>
-                <input
-                  type="date"
-                  value={formData.tanggal_mulai}
-                  onChange={(e) => setFormData({ ...formData, tanggal_mulai: e.target.value })}
-                  className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="text-sm font-semibold text-slate-700">Tanggal Selesai</label>
-                <input
-                  type="date"
-                  value={formData.tanggal_selesai}
-                  onChange={(e) => setFormData({ ...formData, tanggal_selesai: e.target.value })}
-                  className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-            </div>
             <div className="flex gap-2">
               <button
                 type="submit"
@@ -218,13 +234,6 @@ export default function PeriodePage() {
           </div>
         ) : (
           periods.map((p) => {
-            const mulai = new Date(p.tanggal_mulai).toLocaleDateString('id-ID')
-            const selesai = new Date(p.tanggal_selesai).toLocaleDateString('id-ID')
-            const progress =
-              p.penerima_terdistribusi && p.total_penerima
-                ? Math.round((p.penerima_terdistribusi / p.total_penerima) * 100)
-                : 0
-
             return (
               <div key={p.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
                 <div className="flex items-start justify-between mb-3">
@@ -237,15 +246,6 @@ export default function PeriodePage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 text-sm text-slate-500 mb-4">
-                  <div className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-blue-500" />
-                    <span>
-                      {mulai} – {selesai}
-                    </span>
-                  </div>
-                </div>
-
                 <div>
                   <div className="flex justify-between text-sm mb-2">
                     <span className="text-slate-500">Progress Distribusi</span>
@@ -255,7 +255,7 @@ export default function PeriodePage() {
                   </div>
                   <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all ${progress === 100 ? 'bg-green-500' : 'bg-blue-500'}`}
+                      className={`h-full rounded-full transition-all ${p.statistik.progress_distribusi === '100%' ? 'bg-green-500' : 'bg-blue-500'}`}
                       style={{ width: p.statistik.progress_distribusi }}
                     />
                   </div>
@@ -314,6 +314,20 @@ export default function PeriodePage() {
           })
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && periods.length > 0 && (
+        <div className="space-y-4">
+          <p className="text-sm text-slate-500">
+            {getPaginationLabel({
+              page: parsedPage,
+              limit: parsedLimit,
+              size: periods.length
+            })}
+          </p>
+          <Pagination page={parsedPage} pages={totalPages} onPageChange={handlePageChange} />
+        </div>
+      )}
     </div>
   )
 }

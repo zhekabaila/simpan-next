@@ -15,9 +15,10 @@ export default function MonitoringPetaPage() {
   const [recipients, setRecipients] = useState<Recipient[]>([])
   const [periodeList, setPeriodeList] = useState<any[]>([])
   const [selectedPeriode, setSelectedPeriode] = useState('')
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [filterStatus, setFilterStatus] = useState<'semua' | 'sudah_menerima' | 'belum_menerima'>('semua')
+  const [apiStatistics, setApiStatistics] = useState<any>(null)
 
   // Fetch periods on mount
   useEffect(() => {
@@ -63,6 +64,11 @@ export default function MonitoringPetaPage() {
 
           setMarkers(transformedMarkers)
           setRecipients(transformedMarkers)
+
+          // Set statistics from API
+          if (result.statistik) {
+            setApiStatistics(result.statistik)
+          }
         }
       } catch (err: any) {
         const errorMsg = err.message || 'Gagal mengambil data peta sebaran'
@@ -81,12 +87,20 @@ export default function MonitoringPetaPage() {
     return filterStatus === 'semua' || (r.status as string) === filterStatus
   })
 
-  // Calculate stats
-  const stats = {
-    total: recipients.length,
-    sudah_menerima: recipients.filter((r) => r.status === 'sudah_menerima').length,
-    belum_menerima: recipients.filter((r) => r.status === 'belum_menerima').length
-  }
+  // Use stats from API if available, otherwise calculate from recipients
+  const stats = apiStatistics
+    ? {
+        total: apiStatistics.total_penerima || 0,
+        sudah_menerima: apiStatistics.sudah_terima || 0,
+        belum_menerima: apiStatistics.belum_terima || 0,
+        progress: apiStatistics.progress_distribusi || '0%'
+      }
+    : {
+        total: recipients.length,
+        sudah_menerima: recipients.filter((r) => r.status === 'sudah_menerima').length,
+        belum_menerima: recipients.filter((r) => r.status === 'belum_menerima').length,
+        progress: '0%'
+      }
 
   const getStatusIcon = (status: string) => {
     return status === 'sudah_menerima' ? (
@@ -161,7 +175,7 @@ export default function MonitoringPetaPage() {
             <p className="text-3xl font-bold text-green-600">{stats.sudah_menerima}</p>
             {stats.total > 0 && (
               <p className="text-xs text-green-600 font-semibold">
-                ({Math.round((stats.sudah_menerima / stats.total) * 100)}%)
+                ({apiStatistics ? stats.progress : Math.round((stats.sudah_menerima / stats.total) * 100) + '%'})
               </p>
             )}
           </div>
@@ -172,7 +186,11 @@ export default function MonitoringPetaPage() {
             <p className="text-3xl font-bold text-orange-600">{stats.belum_menerima}</p>
             {stats.total > 0 && (
               <p className="text-xs text-orange-600 font-semibold">
-                ({Math.round((stats.belum_menerima / stats.total) * 100)}%)
+                (
+                {apiStatistics
+                  ? `${100 - parseInt(stats.progress)}%`
+                  : Math.round((stats.belum_menerima / stats.total) * 100) + '%'}
+                )
               </p>
             )}
           </div>
