@@ -6,6 +6,7 @@ import { User, MapPin, Briefcase, LogOut, ChevronRight, Edit2, Loader2, Home } f
 import Link from 'next/link'
 import { useTransition, useState, useEffect } from 'react'
 import { masyarakatService } from '@/services/masyarakat'
+import ImageViewer from '@/components/core/image-viewer'
 
 interface ProfileData {
   id: string
@@ -97,13 +98,34 @@ const ProfilPage = () => {
     )
   }
 
-  if (!profileData) {
-    return (
-      <div className="max-w-2xl mx-auto p-4 py-6 flex items-center justify-center min-h-screen">
-        <p className="text-slate-600">Data profil tidak ditemukan</p>
-      </div>
-    )
+  // Use default profile data if empty
+  const displayProfile = profileData || {
+    id: '',
+    user_id: '',
+    nik: '',
+    nama: '',
+    nomor_telepon: '',
+    tanggal_lahir: '',
+    jenis_kelamin: '',
+    alamat: '',
+    rt: '',
+    rw: '',
+    kelurahan: '',
+    kecamatan: '',
+    kota: '',
+    provinsi: '',
+    latitude: '',
+    longitude: '',
+    status_pernikahan: '',
+    jumlah_tanggungan: 0,
+    status_pekerjaan: '',
+    penghasilan_bulanan: 0,
+    status_kepemilikan_rumah: '',
+    foto_rumah: [],
+    created_at: '',
+    updated_at: ''
   }
+
   return (
     <div className="max-w-2xl mx-auto p-4 py-6">
       <h1 className="text-xl font-bold text-slate-800 mb-5">Profil Saya</h1>
@@ -112,16 +134,18 @@ const ProfilPage = () => {
       <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-5 mb-4 text-white">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
-            <span className="text-2xl font-extrabold">{getAvatarInitials(profileData.nama)}</span>
+            <span className="text-2xl font-extrabold">{getAvatarInitials(displayProfile.nama)}</span>
           </div>
           <div>
-            <h2 className="text-lg font-bold">{profileData.nama}</h2>
+            <h2 className="text-lg font-bold">{displayProfile.nama || '-'}</h2>
             <p className="text-blue-100 text-sm">{user?.email}</p>
             <p className="text-blue-100 text-sm">{user?.aktif ? '🟢 Aktif' : '🔴 Tidak Aktif'}</p>
           </div>
-          <button className="ml-auto p-2 bg-white/20 rounded-xl hover:bg-white/30 transition-colors">
+          <Link
+            href={`/masyarakat/profil/1`}
+            className="ml-auto p-2 bg-white/20 rounded-xl hover:bg-white/30 transition-colors">
             <Edit2 className="w-4 h-4" />
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -133,7 +157,7 @@ const ProfilPage = () => {
           </div>
           <h3 className="font-bold text-slate-800">Data Diri</h3>
           <Link
-            href={`/masyarakat/profil/${profileData.id}`}
+            href={`/masyarakat/profil/1`}
             className="ml-auto text-xs text-blue-600 hover:underline font-semibold flex items-center gap-1">
             <Edit2 className="w-3 h-3" />
             Edit
@@ -141,14 +165,14 @@ const ProfilPage = () => {
         </div>
         <div className="space-y-2.5">
           {[
-            { label: 'NIK', value: profileData?.nik || '-' },
+            { label: 'NIK', value: displayProfile?.nik || '-' },
             {
               label: 'RT/RW',
-              value: profileData.rt && profileData.rw ? `${profileData.rt}/${profileData.rw}` : '-'
+              value: displayProfile.rt && displayProfile.rw ? `${displayProfile.rt}/${displayProfile.rw}` : '-'
             },
             {
               label: 'Jumlah Tanggungan',
-              value: profileData.jumlah_tanggungan ? `${profileData.jumlah_tanggungan} orang` : '-'
+              value: displayProfile.jumlah_tanggungan ? `${displayProfile.jumlah_tanggungan} orang` : '-'
             }
           ].map((item) => (
             <div key={item.label} className="flex justify-between py-1.5 border-b border-slate-50 last:border-0">
@@ -167,13 +191,13 @@ const ProfilPage = () => {
           </div>
           <h3 className="font-bold text-slate-800">Alamat</h3>
         </div>
-        <p className="text-sm text-slate-700 leading-relaxed mb-4">{profileData.alamat || '-'}</p>
+        <p className="text-sm text-slate-700 leading-relaxed mb-4">{displayProfile.alamat || '-'}</p>
         <div className="space-y-2">
           {[
-            { label: 'Kelurahan', value: profileData.kelurahan || '-' },
-            { label: 'Kecamatan', value: profileData.kecamatan || '-' },
-            { label: 'Kota', value: profileData.kota || '-' },
-            { label: 'Provinsi', value: profileData.provinsi || '-' }
+            { label: 'Kelurahan', value: displayProfile.kelurahan || '-' },
+            { label: 'Kecamatan', value: displayProfile.kecamatan || '-' },
+            { label: 'Kota', value: displayProfile.kota || '-' },
+            { label: 'Provinsi', value: displayProfile.provinsi || '-' }
           ].map((item) => (
             <div key={item.label} className="flex justify-between text-sm">
               <span className="text-slate-500">{item.label}</span>
@@ -195,10 +219,12 @@ const ProfilPage = () => {
           {[
             {
               label: 'Penghasilan Bulanan',
-              value: profileData.penghasilan_bulanan ? `Rp ${profileData.penghasilan_bulanan.toLocaleString('id-ID')}` : '-'
+              value: displayProfile.penghasilan_bulanan
+                ? `Rp ${displayProfile.penghasilan_bulanan.toLocaleString('id-ID')}`
+                : '-'
             },
-            { label: 'Status Kepemilikan Rumah', value: profileData.status_kepemilikan_rumah || '-' },
-            { label: 'Status Pekerjaan', value: profileData.status_pekerjaan || '-' }
+            { label: 'Status Kepemilikan Rumah', value: displayProfile.status_kepemilikan_rumah || '-' },
+            { label: 'Status Pekerjaan', value: displayProfile.status_pekerjaan || '-' }
           ].map((item) => (
             <div key={item.label} className="flex justify-between py-1.5 border-b border-slate-50 last:border-0">
               <span className="text-sm text-slate-500">{item.label}</span>
@@ -218,16 +244,17 @@ const ProfilPage = () => {
         </div>
         <div className="space-y-2.5">
           {[
-            { label: 'No. Telepon', value: profileData.nomor_telepon || '-' },
+            { label: 'No. Telepon', value: displayProfile.nomor_telepon || '-' },
             {
               label: 'Tanggal Lahir',
-              value: profileData.tanggal_lahir ? new Date(profileData.tanggal_lahir).toLocaleDateString('id-ID') : '-'
+              value: displayProfile.tanggal_lahir ? new Date(displayProfile.tanggal_lahir).toLocaleDateString('id-ID') : '-'
             },
             {
               label: 'Jenis Kelamin',
-              value: profileData.jenis_kelamin === 'L' ? 'Laki-laki' : profileData.jenis_kelamin === 'P' ? 'Perempuan' : '-'
+              value:
+                displayProfile.jenis_kelamin === 'L' ? 'Laki-laki' : displayProfile.jenis_kelamin === 'P' ? 'Perempuan' : '-'
             },
-            { label: 'Status Pernikahan', value: profileData.status_pernikahan?.replace('_', ' ') || '-' }
+            { label: 'Status Pernikahan', value: displayProfile.status_pernikahan?.replace('_', ' ') || '-' }
           ].map((item) => (
             <div key={item.label} className="flex justify-between py-1.5 border-b border-slate-50 last:border-0">
               <span className="text-sm text-slate-500">{item.label}</span>
@@ -238,7 +265,7 @@ const ProfilPage = () => {
       </div>
 
       {/* Foto Rumah */}
-      {profileData.foto_rumah && profileData.foto_rumah.length > 0 && (
+      {displayProfile.foto_rumah && displayProfile.foto_rumah.length > 0 && (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-5">
           <div className="flex items-center gap-2 mb-4">
             <div className="p-2 bg-orange-50 rounded-xl">
@@ -247,11 +274,17 @@ const ProfilPage = () => {
             <h3 className="font-bold text-slate-800">Foto Rumah</h3>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            {profileData.foto_rumah.map((foto) => (
+            {displayProfile.foto_rumah.map((foto) => (
               <div
                 key={foto.id}
                 className="rounded-xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-                <img src={foto.url_foto} alt={foto.jenis_foto} className="w-full h-32 object-cover" />
+                <ImageViewer
+                  src={foto.url_foto}
+                  alt={foto.jenis_foto}
+                  fileName={`${foto.jenis_foto}.jpg`}
+                  className="w-full h-32">
+                  <img src={foto.url_foto} alt={foto.jenis_foto} className="w-full h-32 object-cover" />
+                </ImageViewer>
                 <div className="p-2 bg-slate-50">
                   <p className="text-xs font-semibold text-slate-700 capitalize">{foto.jenis_foto?.replace('_', ' ')}</p>
                   <p className="text-xs text-slate-500 line-clamp-2">{foto.keterangan}</p>

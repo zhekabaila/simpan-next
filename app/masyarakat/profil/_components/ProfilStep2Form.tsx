@@ -23,6 +23,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import useAuthStore from '@/app/_stores/useAuthStore'
 import { masyarakatService } from '@/services/masyarakat'
+import ImageViewer from '@/components/core/image-viewer'
 import { StepIndicator } from './StepIndicator'
 
 interface UploadedPhoto {
@@ -283,7 +284,13 @@ export function ProfilStep2Form() {
 
                 {uploaded && !isEditing && (
                   <div className="mb-4">
-                    <img src={uploaded.url_foto} alt={slot.label} className="w-full h-40 object-cover rounded-xl mb-3" />
+                    <ImageViewer
+                      src={uploaded.url_foto}
+                      alt={slot.label}
+                      fileName={`${slot.label}.jpg`}
+                      className="w-full h-40 rounded-xl mb-3">
+                      <img src={uploaded.url_foto} alt={slot.label} className="w-full h-40 object-cover rounded-xl" />
+                    </ImageViewer>
                     {uploaded.keterangan && (
                       <p className="text-xs text-slate-600 mb-3 p-2 bg-slate-50 rounded-lg">
                         <span className="font-semibold">Keterangan:</span> {uploaded.keterangan}
@@ -327,7 +334,13 @@ export function ProfilStep2Form() {
 
                     {photoState?.preview && (
                       <div className="mb-3">
-                        <img src={photoState.preview} alt="Preview" className="w-full h-40 object-cover rounded-xl" />
+                        <ImageViewer
+                          src={photoState.preview}
+                          alt="Preview"
+                          fileName="preview.jpg"
+                          className="w-full h-40 rounded-xl">
+                          <img src={photoState.preview} alt="Preview" className="w-full h-40 object-cover rounded-xl" />
+                        </ImageViewer>
                       </div>
                     )}
 

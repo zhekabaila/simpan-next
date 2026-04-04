@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { Search, Loader2, MapPin } from 'lucide-react'
+import { Search, Loader2, MapPin, Navigation } from 'lucide-react'
 import 'leaflet/dist/leaflet.css'
 
 interface LatLng {
@@ -79,10 +79,12 @@ export function LocationPicker({
   const [suggestions, setSuggestions] = useState<Suggestion[]>([])
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
+  const [isGettingLocation, setIsGettingLocation] = useState(false)
   const [mapKey, setMapKey] = useState(0)
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; width: number } | null>(null)
   const searchContainerRef = useRef<HTMLDivElement>(null)
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const geolocationAttemptedRef = useRef(false)
 
   // Update coordinates when value prop changes
   useEffect(() => {
@@ -137,6 +139,71 @@ export function LocationPicker({
     },
     [onChange]
   )
+
+  const requestCurrentLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      alert('Geolocation tidak didukung oleh browser Anda')
+      return
+    }
+
+    setIsGettingLocation(true)
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords
+        await updateLocation(latitude, longitude)
+        setMapKey((prev) => prev + 1)
+        setIsGettingLocation(false)
+      },
+      (error) => {
+        console.error('Geolocation error:', error)
+        setIsGettingLocation(false)
+        if (error.code === 1) {
+          alert('Izin geolocation ditolak. Silakan izinkan akses lokasi di pengaturan browser.')
+        } else if (error.code === 2) {
+          alert('Lokasi tidak dapat dipastikan.')
+        } else if (error.code === 3) {
+          alert('Request geolocation timeout.')
+        } else {
+          alert('Terjadi kesalahan saat mendapatkan lokasi.')
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    )
+  }, [updateLocation])
+
+  // Request geolocation on component mount (only if no value provided)
+  useEffect(() => {
+    if (geolocationAttemptedRef.current || value?.lat || value?.long) return
+
+    geolocationAttemptedRef.current = true
+
+    if (!navigator.geolocation) {
+      return
+    }
+
+    setIsGettingLocation(true)
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords
+        await updateLocation(latitude, longitude)
+        setMapKey((prev) => prev + 1)
+        setIsGettingLocation(false)
+      },
+      (error) => {
+        console.warn('Geolocation error:', error.message)
+        setIsGettingLocation(false)
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    )
+  }, [updateLocation])
 
   const fetchSuggestions = useCallback(async (input: string) => {
     if (!input || input.length < 2) {
@@ -262,6 +329,15 @@ export function LocationPicker({
             }}
             className="flex-1"
           />
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            disabled={disabled || isGettingLocation}
+            title="Gunakan lokasi saat ini"
+            onClick={requestCurrentLocation}>
+            {isGettingLocation ? <Loader2 className="h-4 w-4 animate-spin" /> : <Navigation className="h-4 w-4" />}
+          </Button>
           <Button
             type="button"
             variant="outline"

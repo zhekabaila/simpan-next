@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Download, Share2, QrCode, Clock, Info, AlertCircle } from 'lucide-react'
+import { Download, Share2, QrCode, Clock, Info, AlertCircle, FileText } from 'lucide-react'
 import useAuthStore from '@/app/_stores/useAuthStore'
 import { masyarakatService } from '@/services/masyarakat'
 import { StatusBadge } from '@/components/core/StatusBadge'
@@ -30,7 +30,7 @@ export default function QRCodePage() {
         setPengajuanStatus(statusResult)
 
         // Try to fetch QR code
-        if (statusResult.status === 'disetujui') {
+        if (statusResult && statusResult.status === 'disetujui') {
           try {
             const qrResult = await masyarakatService.getQRCode(token)
             setQRCode(qrResult.data)
@@ -49,6 +49,7 @@ export default function QRCodePage() {
   }, [token])
 
   const isApproved = pengajuanStatus?.status === 'disetujui'
+  const hasPengajuan = pengajuanStatus !== null
 
   const handleDownload = async () => {
     if (!qrCode?.url_gambar_qr) return
@@ -126,18 +127,31 @@ export default function QRCodePage() {
       <h1 className="text-xl font-bold text-slate-800 mb-1">QR Code Saya</h1>
       <p className="text-sm text-slate-500 mb-5">Gunakan QR Code ini saat pengambilan bantuan sosial.</p>
 
-      {/* Status */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 mb-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-semibold text-slate-700">Status Pengajuan</span>
-          <StatusBadge status={pengajuanStatus?.status || 'menunggu'} />
+      {!hasPengajuan ? (
+        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+              <FileText className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-blue-800">Belum Ada Pengajuan</p>
+              <p className="text-xs text-blue-600">Anda belum membuat pengajuan bantuan sosial</p>
+            </div>
+          </div>
         </div>
-        <p className="text-sm text-slate-500">
-          Nomor: <span className="font-semibold text-slate-700">{pengajuanStatus?.nomor_pengajuan || '-'}</span>
-        </p>
-      </div>
+      ) : (
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-semibold text-slate-700">Status Pengajuan</span>
+            <StatusBadge status={pengajuanStatus?.status || 'menunggu'} />
+          </div>
+          <p className="text-sm text-slate-500">
+            Nomor: <span className="font-semibold text-slate-700">{pengajuanStatus?.nomor_pengajuan || '-'}</span>
+          </p>
+        </div>
+      )}
 
-      {isApproved && qrCode ? (
+      {hasPengajuan && isApproved && qrCode ? (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
           <div className="flex flex-col items-center">
             {/* QR Code Image */}

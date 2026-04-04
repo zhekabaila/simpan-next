@@ -71,6 +71,32 @@ export function ProfilStep1Form() {
     }))
   }
 
+  // Format phone number to start with country code 62
+  const formatPhoneNumber = (phone: string): string => {
+    // Remove all non-digit characters
+    let cleaned = phone.replace(/\D/g, '')
+    
+    // If starts with 0, replace with 62
+    if (cleaned.startsWith('0')) {
+      cleaned = '62' + cleaned.slice(1)
+    }
+    // If doesn't start with 62, add it
+    else if (!cleaned.startsWith('62')) {
+      cleaned = '62' + cleaned
+    }
+    
+    return cleaned
+  }
+
+  const handlePhoneNumberChange = (value: string) => {
+    // Format the phone number for display
+    const formatted = formatPhoneNumber(value)
+    setFormData((prev) => ({
+      ...prev,
+      nomor_telepon: formatted
+    }))
+  }
+
   const handleLocationChange = (value: { lat: number; long: number; address: string }) => {
     setFormData((prev) => ({
       ...prev,
@@ -87,7 +113,14 @@ export function ProfilStep1Form() {
       setLoading(true)
       setError('')
       setMoreErrors({})
-      await masyarakatService.updateProfil(token, formData)
+      
+      // Format phone number before sending to API
+      const formattedData = {
+        ...formData,
+        nomor_telepon: formatPhoneNumber(formData.nomor_telepon || '')
+      }
+      
+      await masyarakatService.updateProfil(token, formattedData)
       router.push('/masyarakat/profil/2')
     } catch (err: any) {
       setError(err.message || 'Gagal menyimpan profil')
@@ -230,10 +263,11 @@ export function ProfilStep1Form() {
                 <input
                   type="text"
                   value={formData.nomor_telepon || ''}
-                  onChange={(e) => handleInputChange('nomor_telepon', e.target.value)}
-                  placeholder="08xx xxxx xxxx"
+                  onChange={(e) => handlePhoneNumberChange(e.target.value)}
+                  placeholder="08xx xxxx xxxx atau 628xx xxxx xxxx"
                   className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                 />
+                <p className="text-xs text-slate-400 mt-1">Format: dimulai dengan 62 (contoh: 62899189822)</p>
               </div>
             </div>
           </div>

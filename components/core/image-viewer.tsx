@@ -88,7 +88,7 @@ const ImageViewer = ({
       <Dialog open={isOpen} onOpenChange={handleClose}>
         <DialogContent
           hideCloseButton={hideOverlay}
-          className="max-w-[95vw] z-[9999999] max-h-[95vh] w-auto h-auto p-0 border-none bg-white shadow-none overflow-auto">
+          className="z-[9999999] max-w-[95vw] max-h-[95vh] w-auto h-auto border-none bg-white p-4 shadow-none overflow-auto">
           <DialogTitle className="sr-only">{alt}</DialogTitle>
 
           {!hideOverlay && (
