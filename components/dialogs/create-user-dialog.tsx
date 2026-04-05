@@ -241,7 +241,12 @@ export function CreateUserDialog({ open, onOpenChange, onSubmit }: CreateUserDia
                   type="text"
                   maxLength={16}
                   value={formData.nik}
-                  onChange={(e) => setFormData({ ...formData, nik: e.target.value })}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    if (value === '' || /^\d*$/.test(value)) {
+                      setFormData({ ...formData, nik: value })
+                    }
+                  }}
                   placeholder="3201234567890123"
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   disabled={isSubmitting}
@@ -293,10 +298,14 @@ export function CreateUserDialog({ open, onOpenChange, onSubmit }: CreateUserDia
                 <div>
                   <label className="text-xs font-semibold text-slate-600 block mb-1">Jumlah Tanggungan</label>
                   <input
-                    type="number"
-                    min={0}
-                    value={formData.jumlah_tanggungan}
-                    onChange={(e) => setFormData({ ...formData, jumlah_tanggungan: parseInt(e.target.value) || 0 })}
+                    type="text"
+                    value={formData.jumlah_tanggungan || ''}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      if (value === '' || /^\d*$/.test(value)) {
+                        setFormData({ ...formData, jumlah_tanggungan: value === '' ? 0 : parseInt(value, 10) })
+                      }
+                    }}
                     placeholder="0"
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     disabled={isSubmitting}
@@ -343,10 +352,14 @@ export function CreateUserDialog({ open, onOpenChange, onSubmit }: CreateUserDia
               <div>
                 <label className="text-xs font-semibold text-slate-600 block mb-1">Penghasilan Bulanan</label>
                 <input
-                  type="number"
-                  min={0}
-                  value={formData.penghasilan_bulanan}
-                  onChange={(e) => setFormData({ ...formData, penghasilan_bulanan: parseInt(e.target.value) || 0 })}
+                  type="text"
+                  value={formData.penghasilan_bulanan || ''}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    if (value === '' || /^\d*$/.test(value)) {
+                      setFormData({ ...formData, penghasilan_bulanan: value === '' ? 0 : parseInt(value, 10) })
+                    }
+                  }}
                   placeholder="Contoh: 1500000"
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   disabled={isSubmitting}
@@ -390,7 +403,12 @@ export function CreateUserDialog({ open, onOpenChange, onSubmit }: CreateUserDia
                   <input
                     type="text"
                     value={formData.rt}
-                    onChange={(e) => setFormData({ ...formData, rt: e.target.value })}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      if (value === '' || /^\d*$/.test(value)) {
+                        setFormData({ ...formData, rt: value })
+                      }
+                    }}
                     placeholder="02"
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     disabled={isSubmitting}
@@ -402,7 +420,12 @@ export function CreateUserDialog({ open, onOpenChange, onSubmit }: CreateUserDia
                   <input
                     type="text"
                     value={formData.rw}
-                    onChange={(e) => setFormData({ ...formData, rw: e.target.value })}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      if (value === '' || /^\d*$/.test(value)) {
+                        setFormData({ ...formData, rw: value })
+                      }
+                    }}
                     placeholder="05"
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     disabled={isSubmitting}

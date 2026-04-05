@@ -71,6 +71,21 @@ export function ProfilStep1Form() {
     }))
   }
 
+  // Validate numeric input - only allow digits
+  const isNumericInput = (value: string): boolean => {
+    return /^\d*$/.test(value)
+  }
+
+  const handleNumericChange = (field: string, value: string) => {
+    // Only update if empty or contains only digits
+    if (value === '' || isNumericInput(value)) {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: value === '' ? 0 : parseInt(value, 10)
+      }))
+    }
+  }
+
   // Format phone number to start with country code 62
   const formatPhoneNumber = (phone: string): string => {
     // Remove all non-digit characters
@@ -181,7 +196,12 @@ export function ProfilStep1Form() {
                   type="text"
                   maxLength={16}
                   value={formData.nik || ''}
-                  onChange={(e) => handleInputChange('nik', e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    if (value === '' || /^\d*$/.test(value)) {
+                      setFormData((prev) => ({ ...prev, nik: value }))
+                    }
+                  }}
                   placeholder="Masukkan 16 digit NIK"
                   className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                 />
@@ -247,10 +267,9 @@ export function ProfilStep1Form() {
                   Jumlah Tanggungan <span className="text-red-500">*</span>
                 </label>
                 <input
-                  type="number"
-                  min={0}
-                  value={formData.jumlah_tanggungan || 0}
-                  onChange={(e) => handleInputChange('jumlah_tanggungan', parseInt(e.target.value))}
+                  type="text"
+                  value={formData.jumlah_tanggungan || ''}
+                  onChange={(e) => handleNumericChange('jumlah_tanggungan', e.target.value)}
                   placeholder="0"
                   className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                 />
@@ -296,9 +315,9 @@ export function ProfilStep1Form() {
                   Penghasilan Bulanan (Rp) <span className="text-red-500">*</span>
                 </label>
                 <input
-                  type="number"
-                  value={formData.penghasilan_bulanan || 0}
-                  onChange={(e) => handleInputChange('penghasilan_bulanan', parseInt(e.target.value))}
+                  type="text"
+                  value={formData.penghasilan_bulanan || ''}
+                  onChange={(e) => handleNumericChange('penghasilan_bulanan', e.target.value)}
                   placeholder="Contoh: 1500000"
                   className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                 />
@@ -360,7 +379,12 @@ export function ProfilStep1Form() {
                     type="text"
                     maxLength={5}
                     value={formData.rt || ''}
-                    onChange={(e) => handleInputChange('rt', e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      if (value === '' || /^\d*$/.test(value)) {
+                        setFormData((prev) => ({ ...prev, rt: value }))
+                      }
+                    }}
                     placeholder="Cth: 001"
                     className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                   />
@@ -374,7 +398,12 @@ export function ProfilStep1Form() {
                     type="text"
                     maxLength={5}
                     value={formData.rw || ''}
-                    onChange={(e) => handleInputChange('rw', e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      if (value === '' || /^\d*$/.test(value)) {
+                        setFormData((prev) => ({ ...prev, rw: value }))
+                      }
+                    }}
                     placeholder="Cth: 001"
                     className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                   />

@@ -2,11 +2,12 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { FileText, Plus, Calendar, AlertCircle, NotebookTabsIcon } from 'lucide-react'
+import { FileText, Plus, Calendar, AlertCircle, NotebookTabsIcon, Upload } from 'lucide-react'
 import useAuthStore from '@/app/_stores/useAuthStore'
 import { formatUTCDate } from '@/lib/utils'
 import { masyarakatService } from '@/services/masyarakat'
 import { StatusBadge } from '@/components/core/StatusBadge'
+import Link from 'next/link'
 
 export default function PengajuanPage() {
   const router = useRouter()
@@ -80,7 +81,7 @@ export default function PengajuanPage() {
           <h1 className="text-xl font-bold text-slate-800">Pengajuan Saya</h1>
           <p className="text-sm text-slate-500">Riwayat pengajuan bantuan sosial</p>
         </div>
-        {!pengajuanStatus && (
+        {(!pengajuanStatus || pengajuanStatus?.status === 'ditolak') && (
           <button
             onClick={() => router.push('/masyarakat/profil/1')}
             className="flex items-center gap-1.5 px-3 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors">
@@ -153,6 +154,14 @@ export default function PengajuanPage() {
               </div>
             </div>
           </div>
+          {pengajuanStatus?.status === 'ditolak' && (
+            <Link
+              href="/masyarakat/profil/1"
+              className="flex justify-center items-center gap-3 text-base font-medium bg-blue-600 hover:bg-blue-500 text-white px-2.5 py-1.5 rounded-md">
+              <Upload className="w-4 h-4" />
+              Buat Pengajuan
+            </Link>
+          )}
         </div>
       )}
     </div>

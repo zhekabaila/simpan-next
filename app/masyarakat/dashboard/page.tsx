@@ -2,13 +2,14 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { Bell, QrCode, FileText, ChevronRight, CheckCircle2, Clock, Download, Plus, AlertCircle } from 'lucide-react'
+import { Bell, QrCode, FileText, ChevronRight, CheckCircle2, Clock, Download, Plus, AlertCircle, Upload } from 'lucide-react'
 import useAuthStore from '@/app/_stores/useAuthStore'
 import { formatUTCDate } from '@/lib/utils'
 import { masyarakatService } from '@/services/masyarakat'
 import { StatusBadge } from '@/components/core/StatusBadge'
 import ImageViewer from '@/components/core/image-viewer'
 import { downloadFile } from '@/lib/utils'
+import Link from 'next/link'
 
 export default function MasyarakatDashboardPage() {
   const router = useRouter()
@@ -111,7 +112,7 @@ export default function MasyarakatDashboardPage() {
           </p>
         </div>
       ) : (
-        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
               <FileText className="w-5 h-5 text-blue-600" />
@@ -120,6 +121,14 @@ export default function MasyarakatDashboardPage() {
               <p className="text-sm font-semibold text-blue-800">Belum Ada Pengajuan</p>
               <p className="text-xs text-blue-600">Ajukan bantuan sosial untuk memulai</p>
             </div>
+          </div>
+          <div>
+            <Link
+              href="/masyarakat/profil/1"
+              className="flex items-center gap-2 text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white px-2.5 py-1 rounded-md">
+              <Upload className="w-3 h-3" />
+              Buat Pengajuan
+            </Link>
           </div>
         </div>
       )}
@@ -229,16 +238,6 @@ export default function MasyarakatDashboardPage() {
           )}
         </div>
       </div>
-
-      {/* New Application CTA (if no application) */}
-      {!pengajuanStatus && (
-        <button
-          onClick={() => router.push('/masyarakat/profil/1')}
-          className="mt-4 w-full py-3 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 hover:border-blue-300 hover:text-blue-500 transition-all flex items-center justify-center gap-2 text-sm font-semibold">
-          <Plus className="w-4 h-4" />
-          Ajukan Bantuan Baru
-        </button>
-      )}
     </div>
   )
 }
