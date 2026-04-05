@@ -8,7 +8,9 @@ import useAuthStore from '@/app/_stores/useAuthStore'
 import { adminService } from '@/services/admin'
 import { getPaginationLabel, formatUTCDate } from '@/lib/utils'
 import { CreateUserDialog } from '@/components/dialogs/create-user-dialog'
+import { UserDetailDialog } from '@/components/dialogs/user-detail-dialog'
 import { toast } from 'sonner'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 type Role = 'semua' | 'masyarakat' | 'petugas' | 'admin'
 
@@ -53,6 +55,8 @@ export default function PenggunaPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
+  const [selectedUserIdForDetail, setSelectedUserIdForDetail] = useState('')
 
   // Fetch users
   useEffect(() => {
@@ -277,9 +281,35 @@ export default function PenggunaPage() {
                       </td>
                       <td className="py-3.5 px-4 text-sm text-slate-500">{bergabung}</td>
                       <td className="py-3.5 px-4">
-                        <button className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors">
-                          <MoreVertical className="w-4 h-4 text-slate-500" />
-                        </button>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors">
+                              <MoreVertical className="w-4 h-4 text-slate-500" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent align="end" className="w-48 p-2">
+                            <div className="flex flex-col gap-1">
+                              <button
+                                onClick={() => {
+                                  setSelectedUserIdForDetail(user.id)
+                                  setIsDetailDialogOpen(true)
+                                }}
+                                className="w-full text-left px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-md transition-colors">
+                                Detail
+                              </button>
+                              {/* <button
+                                disabled
+                                className="w-full text-left px-3 py-2 text-sm font-medium text-slate-400 cursor-not-allowed">
+                                Edit (Segera Hadir)
+                              </button>
+                              <button
+                                disabled
+                                className="w-full text-left px-3 py-2 text-sm font-medium text-slate-400 cursor-not-allowed">
+                                Hapus (Segera Hadir)
+                              </button> */}
+                            </div>
+                          </PopoverContent>
+                        </Popover>
                       </td>
                     </tr>
                   )
@@ -311,6 +341,12 @@ export default function PenggunaPage() {
       )}
 
       <CreateUserDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen} onSubmit={handleCreateUser} />
+      <UserDetailDialog
+        open={isDetailDialogOpen}
+        onOpenChange={setIsDetailDialogOpen}
+        userId={selectedUserIdForDetail}
+        token={token || ''}
+      />
     </div>
   )
 }
