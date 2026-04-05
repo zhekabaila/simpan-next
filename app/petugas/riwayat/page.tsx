@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Search, Filter, QrCode, AlertCircle } from 'lucide-react'
 import { StatusBadge } from '@/components/core/StatusBadge'
+import { formatUTCDate } from '@/lib/utils'
 import Link from 'next/link'
 import useAuthStore from '@/app/_stores/useAuthStore'
 import { petugasService } from '@/services/petugas'
@@ -169,13 +170,7 @@ export default function RiwayatPage() {
           </div>
         ) : (
           filtered.map((item) => {
-            const scanTime = new Date(item.diterima_pada).toLocaleDateString('id-ID', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            })
+            const scanTime = formatUTCDate(item.diterima_pada, 'datetime')
             return (
               <div key={item.id} className="flex items-center gap-3 px-4 py-3.5">
                 <div className="w-9 h-9 bg-slate-100 rounded-xl flex items-center justify-center text-sm font-bold text-slate-600 flex-shrink-0">

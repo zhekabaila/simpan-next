@@ -1,10 +1,7 @@
-import React from 'react'
-import HomeLayout from './_layouts/home-layout'
+import { redirect, RedirectType } from 'next/navigation'
 
 function HomePage() {
-  return (
-    <HomeLayout />
-  )
+  return redirect('/login', RedirectType.replace)
 }
 
 export default HomePage

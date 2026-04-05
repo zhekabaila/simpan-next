@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
 import { useEffect, useState, useMemo } from 'react'
 import 'leaflet/dist/leaflet.css'
+import { formatUTCDate } from '@/lib/utils'
 
 export interface LocationMarker {
   id: string
@@ -200,15 +201,7 @@ export function LocationViewer({ markers = [], lat = -6.2, long = 106.8, singleM
                       {marker.diterima_pada && (
                         <div className="flex justify-between text-xs border-t border-slate-100 pt-1 mt-1">
                           <span className="text-slate-600">Diterima:</span>
-                          <span className="text-slate-700">
-                            {new Date(marker.diterima_pada).toLocaleDateString('id-ID', {
-                              year: 'numeric',
-                              month: '2-digit',
-                              day: '2-digit',
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                          </span>
+                          <span className="text-slate-700">{formatUTCDate(marker.diterima_pada, 'datetime')}</span>
                         </div>
                       )}
                     </div>

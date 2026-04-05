@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { FileText, Plus, Calendar, AlertCircle, NotebookTabsIcon } from 'lucide-react'
 import useAuthStore from '@/app/_stores/useAuthStore'
+import { formatUTCDate } from '@/lib/utils'
 import { masyarakatService } from '@/services/masyarakat'
 import { StatusBadge } from '@/components/core/StatusBadge'
 
@@ -117,7 +118,7 @@ export default function PengajuanPage() {
             <div className="flex items-center gap-4 text-xs text-slate-400">
               <div className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5" />
-                <span>{new Date(pengajuanStatus.diajukan_pada).toLocaleDateString('id-ID')}</span>
+                <span>{formatUTCDate(pengajuanStatus.diajukan_pada, 'date')}</span>
               </div>
             </div>
             {pengajuanStatus.catatan_admin && (

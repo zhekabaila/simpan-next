@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Bell, QrCode, FileText, ChevronRight, CheckCircle2, Clock, Download, Plus, AlertCircle } from 'lucide-react'
 import useAuthStore from '@/app/_stores/useAuthStore'
+import { formatUTCDate } from '@/lib/utils'
 import { masyarakatService } from '@/services/masyarakat'
 import { StatusBadge } from '@/components/core/StatusBadge'
 import ImageViewer from '@/components/core/image-viewer'
@@ -103,7 +104,7 @@ export default function MasyarakatDashboardPage() {
           <div className="h-px bg-slate-100 my-3" />
           <div className="flex items-center gap-2 text-sm text-slate-500">
             <Clock className="w-4 h-4" />
-            <span>Dikirim: {new Date(pengajuanStatus.diajukan_pada).toLocaleDateString('id-ID')}</span>
+            <span>Dikirim: {formatUTCDate(pengajuanStatus.diajukan_pada, 'date')}</span>
           </div>
           <p className="text-xs text-slate-400 mt-2">
             {pengajuanStatus.catatan_admin || 'Pengajuan Anda sedang dalam proses. Kami akan memberitahu Anda segera.'}
@@ -218,7 +219,7 @@ export default function MasyarakatDashboardPage() {
                     {notif.judul}
                   </p>
                   <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">{notif.pesan}</p>
-                  <p className="text-xs text-slate-300 mt-0.5">{new Date(notif.created_at).toLocaleDateString('id-ID')}</p>
+                  <p className="text-xs text-slate-300 mt-0.5">{formatUTCDate(notif.created_at, 'date')}</p>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-300 flex-shrink-0 mt-1" />
               </div>

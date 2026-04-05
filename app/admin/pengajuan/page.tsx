@@ -7,7 +7,7 @@ import { Pagination } from '@/components/shared/pagination'
 import { StatusBadge } from '@/components/core/StatusBadge'
 import useAuthStore from '@/app/_stores/useAuthStore'
 import { adminService } from '@/services/admin'
-import { getPaginationLabel } from '@/lib/utils'
+import { getPaginationLabel, formatUTCDate } from '@/lib/utils'
 import { toast } from 'sonner'
 
 type FilterStatus = 'semua' | 'menunggu' | 'ditinjau' | 'disetujui' | 'ditolak'
@@ -191,11 +191,7 @@ export default function DaftarPengajuanPage() {
                 </tr>
               ) : (
                 pengajuanData.map((item) => {
-                  const tanggal = new Date(item.diajukan_pada).toLocaleDateString('id-ID', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                  })
+                  const tanggal = formatUTCDate(item.diajukan_pada, 'date')
                   return (
                     <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
                       <td className="py-3.5 px-4 text-sm font-semibold text-slate-700">{item.nomor_pengajuan}</td>

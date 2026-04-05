@@ -6,6 +6,7 @@ import useAuthStore from '@/app/_stores/useAuthStore'
 import { adminService } from '@/services/admin'
 import { LocationViewer, type LocationMarker } from '@/components/core/location-viewer'
 import { toast } from 'sonner'
+import { formatUTCDate } from '@/lib/utils'
 
 type Recipient = LocationMarker
 
@@ -273,15 +274,7 @@ export default function MonitoringPetaPage() {
                   {recipient.diterima_pada && (
                     <div className="flex justify-between border-t border-slate-200 pt-2">
                       <span className="text-slate-600">Diterima:</span>
-                      <span className="text-slate-700">
-                        {new Date(recipient.diterima_pada).toLocaleDateString('id-ID', {
-                          year: 'numeric',
-                          month: '2-digit',
-                          day: '2-digit',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </span>
+                      <span className="text-slate-700">{formatUTCDate(recipient.diterima_pada, 'datetime')}</span>
                     </div>
                   )}
                 </div>

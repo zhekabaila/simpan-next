@@ -6,7 +6,7 @@ import { Search, UserPlus, MoreVertical, Shield, HardHat, Users, AlertCircle } f
 import { Pagination } from '@/components/shared/pagination'
 import useAuthStore from '@/app/_stores/useAuthStore'
 import { adminService } from '@/services/admin'
-import { getPaginationLabel } from '@/lib/utils'
+import { getPaginationLabel, formatUTCDate } from '@/lib/utils'
 import { CreateUserDialog } from '@/components/dialogs/create-user-dialog'
 import { toast } from 'sonner'
 
@@ -244,7 +244,7 @@ export default function PenggunaPage() {
                 users.map((user) => {
                   const roleCfg = roleConfig[user.role as keyof typeof roleConfig]
                   const RoleIcon = roleCfg.icon
-                  const bergabung = user.created_at ? new Date(user.created_at).toLocaleDateString('id-ID') : 'N/A'
+                  const bergabung = user.created_at ? formatUTCDate(user.created_at, 'date') : 'N/A'
                   return (
                     <tr key={user.id} className="hover:bg-slate-50/50 transition-colors">
                       <td className="py-3.5 px-4">

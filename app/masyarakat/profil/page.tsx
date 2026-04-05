@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useTransition, useState, useEffect } from 'react'
 import { masyarakatService } from '@/services/masyarakat'
 import ImageViewer from '@/components/core/image-viewer'
+import { formatUTCDate } from '@/lib/utils'
 
 interface ProfileData {
   id: string
@@ -247,7 +248,7 @@ const ProfilPage = () => {
             { label: 'No. Telepon', value: displayProfile.nomor_telepon || '-' },
             {
               label: 'Tanggal Lahir',
-              value: displayProfile.tanggal_lahir ? new Date(displayProfile.tanggal_lahir).toLocaleDateString('id-ID') : '-'
+              value: displayProfile.tanggal_lahir ? formatUTCDate(displayProfile.tanggal_lahir, 'date') : '-'
             },
             {
               label: 'Jenis Kelamin',

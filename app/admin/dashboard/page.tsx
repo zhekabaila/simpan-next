@@ -5,11 +5,13 @@ import { useState, useEffect } from 'react'
 import { FileText, CheckCircle2, Package, Clock, Bell, BarChart3, AlertCircle, Loader2 } from 'lucide-react'
 import { DateRange } from 'react-day-picker'
 import useAuthStore from '@/app/_stores/useAuthStore'
+import { formatUTCDate } from '@/lib/utils'
 import { adminService } from '@/services/admin'
 import { StatCard } from '@/components/core/StatCard'
 import { StatusBadge } from '@/components/core/StatusBadge'
 import { DateRangePicker } from '@/components/core/date-range-picker'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
+import { format } from 'date-fns'
 
 export default function AdminDashboardPage() {
   const router = useRouter()
@@ -29,12 +31,7 @@ export default function AdminDashboardPage() {
     to: new Date()
   })
 
-  const today = new Date().toLocaleDateString('id-ID', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
+  const today = format(new Date(), 'EEEE, dd MMMM yyyy')
 
   // Format date to YYYY-MM-DD format
   const formatDateForAPI = (date: Date | undefined): string => {
@@ -203,8 +200,7 @@ export default function AdminDashboardPage() {
               <p className="text-blue-100 text-xs font-semibold mb-1">PERIODE AKTIF</p>
               <h2 className="font-bold text-lg">{periode.nama_periode}</h2>
               <p className="text-blue-200 text-sm">
-                {new Date(periode.tanggal_mulai).toLocaleDateString('id-ID')} –{' '}
-                {new Date(periode.tanggal_selesai).toLocaleDateString('id-ID')}
+                {formatUTCDate(periode.tanggal_mulai, 'date')} – {formatUTCDate(periode.tanggal_selesai, 'date')}
               </p>
             </div>
             <span className="bg-green-400 text-green-900 text-xs font-bold px-2.5 py-1 rounded-full">
@@ -324,7 +320,7 @@ export default function AdminDashboardPage() {
                       {app.profil?.nama || app.nama_penerima || app.nama || 'N/A'}
                     </td>
                     <td className="py-3 px-2 text-slate-500 text-xs">
-                      {app.diajukan_pada ? new Date(app.diajukan_pada).toLocaleDateString('id-ID') : 'N/A'}
+                      {app.diajukan_pada ? formatUTCDate(app.diajukan_pada, 'date') : 'N/A'}
                     </td>
                     <td className="py-3 px-2 text-slate-600 text-xs">
                       {app.reviewer?.nama || (app.ditinjau_pada ? 'Ditinjau' : '-')}

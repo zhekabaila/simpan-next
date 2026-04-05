@@ -14,6 +14,49 @@ export const formatDate = (date: Date): string => {
   return !!date ? format(date, 'dd MMMM yyyy') : '-'
 }
 
+/**
+ * Format UTC datetime string to display UTC time WITHOUT timezone conversion
+ * Backend sends: "2026-04-05T12:27:11.000000Z" (UTC)
+ * Expected display: "05/04/2026 12:27" (UTC, NOT converted to local timezone)
+ */
+export const formatUTCDate = (
+  dateString: string | null | undefined,
+  formatPattern: 'date' | 'datetime' = 'date'
+): string => {
+  if (!dateString) return '-'
+
+  try {
+    const date = new Date(dateString)
+
+    if (formatPattern === 'datetime') {
+      // Format: dd/MM/yyyy HH:mm
+      return date
+        .toLocaleString('en-US', {
+          timeZone: 'UTC',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        })
+        .replace(/(\d+)\/(\d+)\/(\d+),\s(\d+):(\d+)/, '$2/$1/$3 $4:$5')
+    } else {
+      // Format: dd/MM/yyyy
+      return date
+        .toLocaleString('en-US', {
+          timeZone: 'UTC',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        })
+        .replace(/(\d+)\/(\d+)\/(\d+)/, '$2/$1/$3')
+    }
+  } catch {
+    return '-'
+  }
+}
+
 export const downloadFile = async (fileUrl: string, fileName: string) => {
   try {
     const file = await fetchFileToBase64(fileUrl, fileName)
@@ -93,7 +136,7 @@ export interface PaginationType {
   order: string
 }
 
-export const getPaginationLabel = (pagination: Omit<PaginationType, "pages" | "sort" | "order"> | null) => {
+export const getPaginationLabel = (pagination: Omit<PaginationType, 'pages' | 'sort' | 'order'> | null) => {
   if (pagination) {
     const { limit, page, size } = pagination
     const start = page * limit - limit + 1

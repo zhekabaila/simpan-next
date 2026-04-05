@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Bell, CheckCircle2, Info, AlertTriangle, Calendar, AlertCircle } from 'lucide-react'
 import useAuthStore from '@/app/_stores/useAuthStore'
+import { formatUTCDate } from '@/lib/utils'
 import { masyarakatService } from '@/services/masyarakat'
 
 const iconMap = {
@@ -140,15 +141,7 @@ export default function MasyarakatNotifikasiPage() {
                         {!notif.sudah_dibaca && <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0 mt-1.5" />}
                       </div>
                       <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{notif.pesan}</p>
-                      <p className="text-xs text-slate-300 mt-1.5">
-                        {new Date(notif.created_at).toLocaleDateString('id-ID', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </p>
+                      <p className="text-xs text-slate-300 mt-1.5">{formatUTCDate(notif.created_at, 'datetime')}</p>
                     </div>
                   </div>
                 </div>
