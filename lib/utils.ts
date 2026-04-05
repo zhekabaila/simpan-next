@@ -1,6 +1,8 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { format } from 'date-fns'
+import { formatInTimeZone } from 'date-fns-tz'
+import { id } from 'date-fns/locale'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -15,9 +17,10 @@ export const formatDate = (date: Date): string => {
 }
 
 /**
- * Format UTC datetime string to display UTC time WITHOUT timezone conversion
+ * Format UTC datetime string to display in Asia/Jakarta timezone (UTC+7)
  * Backend sends: "2026-04-05T12:27:11.000000Z" (UTC)
- * Expected display: "05/04/2026 12:27" (UTC, NOT converted to local timezone)
+ * Expected display: "05/04/2026 12:27" (Asia/Jakarta timezone)
+ * Uses date-fns-tz for proper timezone handling
  */
 export const formatUTCDate = (
   dateString: string | null | undefined,
@@ -26,31 +29,13 @@ export const formatUTCDate = (
   if (!dateString) return '-'
 
   try {
-    const date = new Date(dateString)
+    const dateObj = new Date(dateString)
+    const timeZone = 'Asia/Jakarta'
 
     if (formatPattern === 'datetime') {
-      // Format: dd/MM/yyyy HH:mm
-      return date
-        .toLocaleString('en-US', {
-          timeZone: 'UTC',
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false
-        })
-        .replace(/(\d+)\/(\d+)\/(\d+),\s(\d+):(\d+)/, '$2/$1/$3 $4:$5')
+      return formatInTimeZone(dateObj, timeZone, 'dd/MM/yyyy HH:mm', { locale: id })
     } else {
-      // Format: dd/MM/yyyy
-      return date
-        .toLocaleString('en-US', {
-          timeZone: 'UTC',
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit'
-        })
-        .replace(/(\d+)\/(\d+)\/(\d+)/, '$2/$1/$3')
+      return formatInTimeZone(dateObj, timeZone, 'dd/MM/yyyy', { locale: id })
     }
   } catch {
     return '-'
