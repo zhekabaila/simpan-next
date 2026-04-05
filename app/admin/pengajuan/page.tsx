@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Search, Download } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { Pagination } from '@/components/shared/pagination'
 import { StatusBadge } from '@/components/core/StatusBadge'
 import useAuthStore from '@/app/_stores/useAuthStore'
@@ -126,10 +126,10 @@ export default function DaftarPengajuanPage() {
           <h1 className="text-xl font-bold text-slate-800">Daftar Pengajuan</h1>
           <p className="text-sm text-slate-500">Kelola dan tinjau pengajuan bantuan sosial</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors text-sm shadow-md shadow-blue-200">
+        {/* <button className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors text-sm shadow-md shadow-blue-200">
           <Download className="w-4 h-4" />
           Ekspor
-        </button>
+        </button> */}
       </div>
 
       {/* Filter Tabs */}

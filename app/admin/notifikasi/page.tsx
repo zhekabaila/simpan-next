@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Bell, Send, CheckCircle2, QrCode, Calendar, MessageSquare, AlertCircle, X } from 'lucide-react'
+import { Bell, CheckCircle2, QrCode, Calendar, MessageSquare, AlertCircle, X } from 'lucide-react'
 import useAuthStore from '@/app/_stores/useAuthStore'
 import { adminService } from '@/services/admin'
 import { Pagination } from '@/components/shared/pagination'
@@ -179,12 +179,12 @@ export default function NotifikasiPage() {
           <h1 className="text-xl font-bold text-slate-800">Notifikasi & Log</h1>
           <p className="text-sm text-slate-500">Riwayat notifikasi yang dikirim ke pengguna</p>
         </div>
-        <button
+        {/* <button
           onClick={() => setShowModal(true)}
           className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors text-sm shadow-md shadow-blue-200">
           <Send className="w-4 h-4" />
           Kirim Notifikasi
-        </button>
+        </button> */}
       </div>
 
       {/* Filter */}

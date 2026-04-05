@@ -74,7 +74,7 @@ export default function LoginPage() {
         <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200 mb-4">
           <Shield className="w-9 h-9 text-white" />
         </div>
-        <h1 className="text-2xl font-extrabold text-slate-800">SIBANSOS-QR</h1>
+        <h1 className="text-2xl font-extrabold text-slate-800">SIMPAN</h1>
         <p className="text-slate-500 mt-1 text-center max-w-xs">Penyaluran Bantuan Sosial yang Tepat Sasaran</p>
       </div>
 
@@ -140,7 +140,7 @@ export default function LoginPage() {
         </p>
       </div>
 
-      <p className="mt-6 text-xs text-slate-400 text-center">© 2025 SIBANSOS-QR · Kementerian Sosial RI</p>
+      <p className="mt-6 text-xs text-slate-400 text-center">© 2025 SIMPAN · Kementerian Sosial RI</p>
     </div>
   )
 }

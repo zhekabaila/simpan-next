@@ -1,4 +1,4 @@
-# Implementation Progress - SIBANSOS-QR API Integration
+# Implementation Progress - SIMPAN API Integration
 
 ## ✅ Completed Components
 

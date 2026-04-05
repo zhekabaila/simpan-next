@@ -28,7 +28,7 @@ export default function PetugasLayout({ children }: { children: React.ReactNode 
             <Shield className="w-4.5 h-4.5 text-white" />
           </div>
           <div>
-            <span className="font-bold text-slate-800 text-sm">SIBANSOS-QR</span>
+            <span className="font-bold text-slate-800 text-sm">SIMPAN</span>
             <p className="text-xs text-slate-400">Petugas Lapangan</p>
           </div>
         </div>

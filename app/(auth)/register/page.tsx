@@ -88,7 +88,7 @@ export default function RegisterPage() {
             <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center">
               <Shield className="w-4 h-4 text-white" />
             </div>
-            <span className="font-bold text-slate-800">SIBANSOS-QR</span>
+            <span className="font-bold text-slate-800">SIMPAN</span>
           </div>
         </div>
 

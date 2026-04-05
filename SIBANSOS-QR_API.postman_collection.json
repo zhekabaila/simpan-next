@@ -1,7 +1,7 @@
 {
   "info": {
-    "_postman_id": "sibansos-qr-api-2026",
-    "name": "SIBANSOS-QR API",
+    "_postman_id": "SIMPAN-api-2026",
+    "name": "SIMPAN API",
     "description": "REST API untuk Sistem Distribusi Bantuan Sosial dengan Verifikasi QR Code",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "27017582"

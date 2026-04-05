@@ -154,9 +154,6 @@ export default function AdminDashboardPage() {
           onClick={() => router.push('/admin/notifikasi')}
           className="relative p-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">
           <Bell className="w-5 h-5 text-slate-600" />
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
-            3
-          </span>
         </button>
       </div>
 
@@ -198,10 +195,7 @@ export default function AdminDashboardPage() {
           <div className="flex items-start justify-between mb-3">
             <div>
               <p className="text-blue-100 text-xs font-semibold mb-1">PERIODE AKTIF</p>
-              <h2 className="font-bold text-lg">{periode.nama_periode}</h2>
-              <p className="text-blue-200 text-sm">
-                {formatUTCDate(periode.tanggal_mulai, 'date')} – {formatUTCDate(periode.tanggal_selesai, 'date')}
-              </p>
+              <h2 className="font-bold text-lg">{periode.nama}</h2>
             </div>
             <span className="bg-green-400 text-green-900 text-xs font-bold px-2.5 py-1 rounded-full">
               {periode.status === 'aktif' ? 'Berlangsung' : 'Selesai'}
@@ -242,14 +236,14 @@ export default function AdminDashboardPage() {
                   <p className="text-blue-700 font-semibold">Total Distribusi</p>
                   <p className="text-2xl font-bold text-blue-900">{chartSummary.total_distribusi || 0}</p>
                 </div>
-                <div>
+                {/* <div>
                   <p className="text-blue-700 font-semibold">Tanggal Mulai</p>
                   <p className="text-slate-600">{chartSummary.tanggal_mulai || '-'}</p>
                 </div>
                 <div>
                   <p className="text-blue-700 font-semibold">Tanggal Akhir</p>
                   <p className="text-slate-600">{chartSummary.tanggal_akhir || '-'}</p>
-                </div>
+                </div> */}
               </div>
             </div>
           )}
