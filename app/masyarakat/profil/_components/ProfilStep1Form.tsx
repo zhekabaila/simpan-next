@@ -9,6 +9,7 @@ import { masyarakatService } from '@/services/masyarakat'
 import { StepIndicator } from './StepIndicator'
 import { formatDateForInput } from '@/lib/date-utils'
 import { LocationPicker } from '@/components/core/location-picker'
+import { toast } from 'sonner'
 
 interface FormData {
   nama: string
@@ -90,7 +91,7 @@ export function ProfilStep1Form() {
   const formatPhoneNumber = (phone: string): string => {
     // Remove all non-digit characters
     let cleaned = phone.replace(/\D/g, '')
-    
+
     // If starts with 0, replace with 62
     if (cleaned.startsWith('0')) {
       cleaned = '62' + cleaned.slice(1)
@@ -99,7 +100,7 @@ export function ProfilStep1Form() {
     else if (!cleaned.startsWith('62')) {
       cleaned = '62' + cleaned
     }
-    
+
     return cleaned
   }
 
@@ -128,18 +129,19 @@ export function ProfilStep1Form() {
       setLoading(true)
       setError('')
       setMoreErrors({})
-      
+
       // Format phone number before sending to API
       const formattedData = {
         ...formData,
         nomor_telepon: formatPhoneNumber(formData.nomor_telepon || '')
       }
-      
+
       await masyarakatService.updateProfil(token, formattedData)
       router.push('/masyarakat/profil/2')
     } catch (err: any) {
       setError(err.message || 'Gagal menyimpan profil')
       setMoreErrors(err.errors || {})
+      toast.error(err.message || 'Gagal menyimpan profil')
     } finally {
       setLoading(false)
     }
@@ -187,8 +189,8 @@ export function ProfilStep1Form() {
         <div className="space-y-5">
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
             <h2 className="font-bold text-slate-800 mb-4">Data Diri</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="sm:col-span-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
                 <label className="text-sm font-semibold text-slate-700 mb-1.5 block">
                   NIK (16 digit) <span className="text-red-500">*</span>
                 </label>
@@ -207,7 +209,7 @@ export function ProfilStep1Form() {
                 />
               </div>
 
-              <div className="sm:col-span-2">
+              <div className="md:col-span-2">
                 <label className="text-sm font-semibold text-slate-700 mb-1.5 block">
                   Nama <span className="text-red-500">*</span>
                 </label>
@@ -275,7 +277,7 @@ export function ProfilStep1Form() {
                 />
               </div>
 
-              <div className="col-span-2">
+              <div className="md:col-span-2">
                 <label className="text-sm font-semibold text-slate-700 mb-1.5 block">
                   Nomor Telepon <span className="text-red-500">*</span>
                 </label>
@@ -293,7 +295,7 @@ export function ProfilStep1Form() {
 
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
             <h2 className="font-bold text-slate-800 mb-4">Kondisi Ekonomi</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-semibold text-slate-700 mb-1.5 block">
                   Status Pekerjaan <span className="text-red-500">*</span>
@@ -323,7 +325,7 @@ export function ProfilStep1Form() {
                 />
               </div>
 
-              <div className="sm:col-span-2">
+              <div className="md:col-span-2">
                 <label className="text-sm font-semibold text-slate-700 mb-1.5 block">
                   Status Kepemilikan Rumah <span className="text-red-500">*</span>
                 </label>
@@ -357,8 +359,8 @@ export function ProfilStep1Form() {
               />
 
               {/* Address Details */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-200">
-                <div className="sm:col-span-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-200">
+                <div className="md:col-span-2">
                   <label className="text-sm font-semibold text-slate-700 mb-1.5 block">
                     Alamat <span className="text-red-500">*</span>
                   </label>

@@ -7,6 +7,7 @@ import { masyarakatService } from '@/services/masyarakat'
 import { StatusBadge } from '@/components/core/StatusBadge'
 import ImageViewer from '@/components/core/image-viewer'
 import { downloadFile } from '@/lib/utils'
+import { toast } from 'sonner'
 
 export default function QRCodePage() {
   const { token } = useAuthStore()
@@ -39,7 +40,9 @@ export default function QRCodePage() {
           }
         }
       } catch (err: any) {
-        setError(err.message)
+        const errorMsg = err?.message || 'Gagal memuat QR Code'
+        setError(errorMsg)
+        toast.error(errorMsg)
       } finally {
         setLoading(false)
       }

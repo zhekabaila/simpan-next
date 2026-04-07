@@ -7,6 +7,7 @@ import useAuthStore from '@/app/_stores/useAuthStore'
 import { adminService } from '@/services/admin'
 import { Pagination } from '@/components/shared/pagination'
 import { getPaginationLabel } from '@/lib/utils'
+import { toast } from 'sonner'
 
 type NotifType = 'semua' | 'status_pengajuan' | 'jadwal_distribusi' | 'qr_siap' | 'umum'
 
@@ -81,7 +82,9 @@ export default function NotifikasiPage() {
           setTotalPages(result.pages)
         }
       } catch (err: any) {
-        setError(err.message)
+        const errorMsg = err?.message || 'Gagal memuat notifikasi'
+        setError(errorMsg)
+        toast.error(errorMsg)
       } finally {
         setLoading(false)
       }
@@ -99,7 +102,9 @@ export default function NotifikasiPage() {
         const result = await adminService.getDaftarPengguna(token, 1, 100)
         if (result.data) setUsers(result.data)
       } catch (err: any) {
-        setError(err.message)
+        const errorMsg = err?.message || 'Gagal memuat daftar pengguna'
+        setError(errorMsg)
+        toast.error(errorMsg)
       }
     }
 
@@ -142,7 +147,9 @@ export default function NotifikasiPage() {
         }
       }
     } catch (err: any) {
-      setError(err.message)
+      const errorMsg = err?.message || 'Gagal mengirim notifikasi'
+      setError(errorMsg)
+      toast.error(errorMsg)
     }
   }
 

@@ -21,6 +21,7 @@ import { StatusBadge } from '@/components/core/StatusBadge'
 import ImageViewer from '@/components/core/image-viewer'
 import { LocationViewer } from '@/components/core/location-viewer'
 import { formatDateForDisplay } from '@/lib/date-utils'
+import { toast } from 'sonner'
 
 interface DetailPengajuanType {
   id: string
@@ -102,7 +103,9 @@ export default function DetailPengajuanContent({ id, token }: DetailPengajuanCon
         }
       } catch (err: any) {
         if (isMounted) {
-          setError(err.message || 'Gagal memuat detail pengajuan')
+          const errorMsg = err?.message || 'Gagal memuat detail pengajuan'
+          setError(errorMsg)
+          toast.error(errorMsg)
         }
       } finally {
         if (isMounted) {
@@ -126,7 +129,9 @@ export default function DetailPengajuanContent({ id, token }: DetailPengajuanCon
       setDecision('approved')
       setShowSuccess(true)
     } catch (err: any) {
-      setError(err.message || 'Gagal menyetujui pengajuan')
+      const errorMsg = err?.message || 'Gagal menyetujui pengajuan'
+      setError(errorMsg)
+      toast.error(errorMsg)
       setSubmitting(false)
     }
   }
@@ -134,7 +139,9 @@ export default function DetailPengajuanContent({ id, token }: DetailPengajuanCon
   const handleReject = async () => {
     if (!token || !detail) return
     if (!catatan.trim()) {
-      setError('Catatan penolakan tidak boleh kosong')
+      const errorMsg = 'Catatan penolakan tidak boleh kosong'
+      setError(errorMsg)
+      toast.error(errorMsg)
       return
     }
     try {
@@ -143,7 +150,9 @@ export default function DetailPengajuanContent({ id, token }: DetailPengajuanCon
       setDecision('rejected')
       setShowSuccess(true)
     } catch (err: any) {
-      setError(err.message || 'Gagal menolak pengajuan')
+      const errorMsg = err?.message || 'Gagal menolak pengajuan'
+      setError(errorMsg)
+      toast.error(errorMsg)
       setSubmitting(false)
     }
   }

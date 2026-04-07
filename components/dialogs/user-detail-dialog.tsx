@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react'
 import { AlertCircle, Loader2, User, Briefcase, Calendar } from 'lucide-react'
 import { formatUTCDate } from '@/lib/utils'
 import { adminService } from '@/services/admin'
+import { toast } from 'sonner'
 
 interface UserDetailDialogProps {
   open: boolean
@@ -37,7 +38,9 @@ export function UserDetailDialog({ open, onOpenChange, userId, token }: UserDeta
           setUserDetail(result.data)
         }
       } catch (err: any) {
-        setError(err.message || 'Gagal memuat detail pengguna')
+        const errorMsg = err?.message || 'Gagal memuat detail pengguna'
+        setError(errorMsg)
+        toast.error(errorMsg)
       } finally {
         setLoading(false)
       }

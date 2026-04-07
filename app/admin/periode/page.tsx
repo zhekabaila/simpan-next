@@ -47,7 +47,9 @@ export default function PeriodePage() {
           setTotalPages(result.pages)
         }
       } catch (err: any) {
-        setError(err.message)
+        const errorMsg = err?.message || 'Gagal memuat periode'
+        setError(errorMsg)
+        toast.error(errorMsg)
       } finally {
         setLoading(false)
       }

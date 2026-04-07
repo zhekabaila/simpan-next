@@ -54,7 +54,9 @@ export default function DaftarPengajuanPage() {
           setTotalPages(result.pages)
         }
       } catch (err: any) {
-        setError(err.message)
+        const errorMsg = err?.message || 'Gagal memuat data pengajuan'
+        setError(errorMsg)
+        toast.error(errorMsg)
       } finally {
         setLoading(false)
       }

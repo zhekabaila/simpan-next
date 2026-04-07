@@ -6,6 +6,7 @@ import { QrCode, MapPin, Users, CheckCircle2, Clock, AlertCircle } from 'lucide-
 import { StatusBadge } from '@/components/core/StatusBadge'
 import useAuthStore from '@/app/_stores/useAuthStore'
 import { petugasService } from '@/services/petugas'
+import { toast } from 'sonner'
 
 export default function PetugasDashboardPage() {
   const router = useRouter()
@@ -32,7 +33,9 @@ export default function PetugasDashboardPage() {
           setRecentScans(scansResult.data)
         }
       } catch (err: any) {
-        setError(err.message)
+        const errorMsg = err?.message || 'Gagal memuat dashboard'
+        setError(errorMsg)
+        toast.error(errorMsg)
       } finally {
         setLoading(false)
       }

@@ -10,6 +10,7 @@ import { StatusBadge } from '@/components/core/StatusBadge'
 import ImageViewer from '@/components/core/image-viewer'
 import { downloadFile } from '@/lib/utils'
 import Link from 'next/link'
+import { toast } from 'sonner'
 
 export default function MasyarakatDashboardPage() {
   const router = useRouter()
@@ -47,7 +48,9 @@ export default function MasyarakatDashboardPage() {
           }
         }
       } catch (err: any) {
-        setError(err.message)
+        const errorMsg = err?.message || 'Gagal memuat data'
+        setError(errorMsg)
+        toast.error(errorMsg)
       } finally {
         setLoading(false)
       }
@@ -146,14 +149,14 @@ export default function MasyarakatDashboardPage() {
               {/* QR Code Image */}
               <ImageViewer hideOverlay fileName={qrCode.token_qr} src={qrCode.url_gambar_qr} alt={qrCode.token_qr} />
               <p className="text-xs text-slate-500 font-mono">{qrCode.token_qr}</p>
-              <button
+              {/* <button
                 onClick={() => {
                   downloadFile(qrCode.url_gambar_qr, `${qrCode.token_qr}.svg`)
                 }}
                 className="flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-700">
                 <Download className="w-4 h-4" />
                 Unduh QR Code
-              </button>
+              </button> */}
             </div>
           ) : (
             <div className="bg-white rounded-xl p-4 text-center text-slate-600">

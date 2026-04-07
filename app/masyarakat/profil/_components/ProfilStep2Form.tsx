@@ -25,6 +25,7 @@ import useAuthStore from '@/app/_stores/useAuthStore'
 import { masyarakatService } from '@/services/masyarakat'
 import ImageViewer from '@/components/core/image-viewer'
 import { StepIndicator } from './StepIndicator'
+import { toast } from 'sonner'
 
 interface UploadedPhoto {
   id: string
@@ -106,11 +107,13 @@ export function ProfilStep2Form() {
   const handleFileChange = (keyphoto: string, file: File) => {
     if (file.size > 2048 * 1024) {
       setError('Ukuran file tidak boleh lebih dari 2MB')
+      toast.error('Ukuran file tidak boleh lebih dari 2MB')
       return
     }
 
     if (!['image/jpeg', 'image/png'].includes(file.type)) {
       setError('Format file hanya boleh JPEG atau PNG')
+      toast.error('Format file hanya boleh JPEG atau PNG')
       return
     }
 
@@ -178,6 +181,7 @@ export function ProfilStep2Form() {
         ...prev,
         [keyphoto]: { ...prev[keyphoto], isUploading: false }
       }))
+      toast.error(err.message || 'Gagal upload foto')
     }
   }
 
@@ -197,6 +201,7 @@ export function ProfilStep2Form() {
       setEditingId(null)
     } catch (err: any) {
       setError(err.message || 'Gagal menghapus foto')
+      toast.error(err.message || 'Gagal upload foto')
     }
   }
 
@@ -204,6 +209,7 @@ export function ProfilStep2Form() {
     const uploadedCount = Object.keys(uploadedPhotos).length
     if (uploadedCount < photoSlots.length) {
       setError(`Semua foto harus diunggah. ${uploadedCount}/${photoSlots.length} foto`)
+      toast.error(`Semua foto harus diunggah. ${uploadedCount}/${photoSlots.length} foto`)
       return
     }
 
@@ -213,6 +219,7 @@ export function ProfilStep2Form() {
       router.push('/masyarakat/profil/3')
     } catch (err: any) {
       setError(err.message || 'Gagal melanjutkan')
+      toast.error('Terjadi kesalahan ketika mencoba menyimpan profil')
     } finally {
       setLoading(false)
     }

@@ -11,6 +11,7 @@ import {
 import { LocationPicker } from '@/components/core/location-picker'
 import { useState } from 'react'
 import { AlertCircle } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface FormData {
   nama: string
@@ -72,7 +73,9 @@ export function CreateUserDialog({ open, onOpenChange, onSubmit }: CreateUserDia
   const handleSubmit = async () => {
     // Validate required fields
     if (!formData.nama || !formData.email || !formData.password || !formData.nik) {
-      setError('Mohon lengkapi semua field yang diperlukan (*)')
+      const errorMsg = 'Mohon lengkapi semua field yang diperlukan (*)'
+      setError(errorMsg)
+      toast.error(errorMsg)
       return
     }
 
@@ -110,7 +113,9 @@ export function CreateUserDialog({ open, onOpenChange, onSubmit }: CreateUserDia
         onOpenChange(false)
       }, 1500)
     } catch (err: any) {
-      setError(err.message || 'Gagal menambah pengguna')
+      const errorMsg = err?.message || 'Gagal menambah pengguna'
+      setError(errorMsg)
+      toast.error(errorMsg)
       // Stay open so user can see error
     } finally {
       setIsSubmitting(false)

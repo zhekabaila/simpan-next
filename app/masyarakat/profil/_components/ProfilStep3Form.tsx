@@ -8,6 +8,7 @@ import useAuthStore from '@/app/_stores/useAuthStore'
 import { masyarakatService } from '@/services/masyarakat'
 import { StepIndicator } from './StepIndicator'
 import { formatDateForDisplay } from '@/lib/date-utils'
+import { toast } from 'sonner'
 
 interface FormData {
   nik: string
@@ -79,6 +80,7 @@ export function ProfilStep3Form() {
       setSubmitted(true)
     } catch (err: any) {
       setError(err.message || 'Gagal menyelesaikan profil')
+      toast.error(err.message || 'Gagal menyelesaikan profil')
     } finally {
       setLoading(false)
     }

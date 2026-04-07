@@ -57,7 +57,9 @@ export default function ScanQRPage() {
         }
       } catch (err: any) {
         console.error('Failed to fetch assignment:', err)
-        setError('Gagal memuat penugasan')
+        const errorMsg = 'Gagal memuat penugasan'
+        setError(errorMsg)
+        toast.error(errorMsg)
       }
     }
 
@@ -92,13 +94,17 @@ export default function ScanQRPage() {
 
   const handleScanSubmit = async (token_qr: string) => {
     if (!token || !location || !assignment) {
-      setError('Data tidak lengkap')
+      const errorMsg = 'Data tidak lengkap'
+      setError(errorMsg)
+      toast.error(errorMsg)
       setIsPaused(false)
       return
     }
 
     if (!token_qr.trim()) {
-      setError('Masukkan token QR code')
+      const errorMsg = 'Masukkan token QR code'
+      setError(errorMsg)
+      toast.error(errorMsg)
       setIsPaused(false)
       return
     }
@@ -134,7 +140,7 @@ export default function ScanQRPage() {
         })
       }
     } catch (err: any) {
-      const errorMsg = err.message || 'Scan gagal'
+      const errorMsg = err?.message || 'Scan gagal'
       toast.error('Error', {
         description: errorMsg,
         duration: 3000

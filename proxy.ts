@@ -26,6 +26,8 @@ function getRequiredRoleForPath(pathname: string): string | null {
   return null
 }
 
+const shouldRedirectRoute = ['/', '/masyarakat', '/petugas', '/admin']
+
 export async function proxy(request: NextRequest) {
   const c = await cookies()
   const pathname = request.nextUrl.pathname
@@ -35,6 +37,12 @@ export async function proxy(request: NextRequest) {
   const role = c.get('role')?.value
 
   const isPublic = isPublicRoute(pathname)
+
+  const isNotfoundPage = shouldRedirectRoute.some((e) => pathname === e)
+
+  if (isNotfoundPage) {
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
 
   // Case 1: No token
   if (!token) {

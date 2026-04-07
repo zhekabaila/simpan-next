@@ -78,7 +78,9 @@ export default function PenggunaPage() {
           setTotalPages(result.pages)
         }
       } catch (err: any) {
-        setError(err.message)
+        const errorMsg = err?.message || 'Gagal memuat data pengguna'
+        setError(errorMsg)
+        toast.error(errorMsg)
       } finally {
         setLoading(false)
       }

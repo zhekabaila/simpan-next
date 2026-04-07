@@ -12,6 +12,7 @@ import { StatusBadge } from '@/components/core/StatusBadge'
 import { DateRangePicker } from '@/components/core/date-range-picker'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { format } from 'date-fns'
+import { toast } from 'sonner'
 
 export default function AdminDashboardPage() {
   const router = useRouter()
@@ -63,8 +64,10 @@ export default function AdminDashboardPage() {
         setChartSummary(result.summary)
       }
     } catch (err: any) {
+      const errorMsg = err?.message || 'Gagal memuat data grafik'
       console.error('Failed to fetch chart data:', err)
-      // Optionally show error toast here
+      setError(errorMsg)
+      toast.error(errorMsg)
     } finally {
       setChartLoading(false)
     }
@@ -94,7 +97,9 @@ export default function AdminDashboardPage() {
           setPengajuan(pengajuanRes.data)
         }
       } catch (err: any) {
-        setError(err.message)
+        const errorMsg = err?.message || 'Gagal memuat dashboard'
+        setError(errorMsg)
+        toast.error(errorMsg)
       } finally {
         setLoading(false)
       }

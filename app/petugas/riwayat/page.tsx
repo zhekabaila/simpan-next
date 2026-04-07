@@ -7,6 +7,7 @@ import { formatUTCDate } from '@/lib/utils'
 import Link from 'next/link'
 import useAuthStore from '@/app/_stores/useAuthStore'
 import { petugasService } from '@/services/petugas'
+import { toast } from 'sonner'
 
 type FilterStatus = 'semua' | 'diterima' | 'duplikat' | 'gagal'
 
@@ -56,7 +57,9 @@ export default function RiwayatPage() {
           setTotalPages(result.pages)
         }
       } catch (err: any) {
-        setError(err.message)
+        const errorMsg = err?.message || 'Gagal memuat riwayat'
+        setError(errorMsg)
+        toast.error(errorMsg)
       } finally {
         setLoading(false)
       }

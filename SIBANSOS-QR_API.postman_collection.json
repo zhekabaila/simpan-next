@@ -22,7 +22,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"nama\": \"John Doe\",\n    \"email\": \"user@sibansos.id\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\"\n}",
+              "raw": "{\n    \"nama\": \"John Doe\",\n    \"email\": \"user@simpan.id\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -49,7 +49,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"nama\": \"John Doe\",\n    \"email\": \"user@sibansos.id\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\"\n}"
+                  "raw": "{\n    \"nama\": \"John Doe\",\n    \"email\": \"user@simpan.id\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\"\n}"
                 },
                 "url": {
                   "raw": "{{base_url}}/api/auth/register",
@@ -67,7 +67,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Registrasi berhasil\",\n    \"data\": {\n        \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n        \"nama\": \"John Doe\",\n        \"email\": \"user@sibansos.id\",\n        \"aktif\": true,\n        \"roles\": [\"masyarakat\"],\n        \"permissions\": [],\n        \"created_at\": \"2026-03-16T09:30:00.000Z\"\n    },\n    \"token_type\": \"bearer\",\n    \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"expires_in\": 3600\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Registrasi berhasil\",\n    \"data\": {\n        \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n        \"nama\": \"John Doe\",\n        \"email\": \"user@simpan.id\",\n        \"aktif\": true,\n        \"roles\": [\"masyarakat\"],\n        \"permissions\": [],\n        \"created_at\": \"2026-03-16T09:30:00.000Z\"\n    },\n    \"token_type\": \"bearer\",\n    \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"expires_in\": 3600\n}"
             }
           ]
         },
@@ -83,7 +83,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"email\": \"admin@sibansos.id\",\n    \"password\": \"admin123\"\n}",
+              "raw": "{\n    \"email\": \"admin@simpan.id\",\n    \"password\": \"admin123\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -110,7 +110,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"email\": \"admin@sibansos.id\",\n    \"password\": \"admin123\"\n}"
+                  "raw": "{\n    \"email\": \"admin@simpan.id\",\n    \"password\": \"admin123\"\n}"
                 },
                 "url": {
                   "raw": "{{base_url}}/api/auth/login",
@@ -128,7 +128,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Login berhasil\",\n    \"data\": {\n        \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n        \"nama\": \"Admin\",\n        \"email\": \"admin@sibansos.id\",\n        \"aktif\": true,\n        \"roles\": [\"admin\"],\n        \"permissions\": [\n            \"kelola-pengguna\",\n            \"kelola-periode-bansos\",\n            \"tinjau-pengajuan\"\n        ],\n        \"created_at\": \"2026-03-16T09:00:00.000Z\"\n    },\n    \"token_type\": \"bearer\",\n    \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"expires_in\": 3600\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Login berhasil\",\n    \"data\": {\n        \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n        \"nama\": \"Admin\",\n        \"email\": \"admin@simpan.id\",\n        \"aktif\": true,\n        \"roles\": [\"admin\"],\n        \"permissions\": [\n            \"kelola-pengguna\",\n            \"kelola-periode-bansos\",\n            \"tinjau-pengajuan\"\n        ],\n        \"created_at\": \"2026-03-16T09:00:00.000Z\"\n    },\n    \"token_type\": \"bearer\",\n    \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"expires_in\": 3600\n}"
             }
           ]
         },
@@ -275,7 +275,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"success\": true,\n    \"message\": \"Data user ditemukan\",\n    \"data\": {\n        \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n        \"nama\": \"Admin\",\n        \"email\": \"admin@sibansos.id\",\n        \"aktif\": true,\n        \"roles\": [\"admin\"],\n        \"permissions\": [\n            \"kelola-pengguna\",\n            \"kelola-periode-bansos\"\n        ],\n        \"created_at\": \"2026-03-16T09:00:00.000Z\"\n    }\n}"
+              "body": "{\n    \"success\": true,\n    \"message\": \"Data user ditemukan\",\n    \"data\": {\n        \"id\": \"550e8400-e29b-41d4-a716-446655440001\",\n        \"nama\": \"Admin\",\n        \"email\": \"admin@simpan.id\",\n        \"aktif\": true,\n        \"roles\": [\"admin\"],\n        \"permissions\": [\n            \"kelola-pengguna\",\n            \"kelola-periode-bansos\"\n        ],\n        \"created_at\": \"2026-03-16T09:00:00.000Z\"\n    }\n}"
             }
           ]
         }

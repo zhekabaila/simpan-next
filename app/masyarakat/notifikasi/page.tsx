@@ -5,6 +5,7 @@ import { Bell, CheckCircle2, Info, AlertTriangle, Calendar, AlertCircle } from '
 import useAuthStore from '@/app/_stores/useAuthStore'
 import { formatUTCDate } from '@/lib/utils'
 import { masyarakatService } from '@/services/masyarakat'
+import { toast } from 'sonner'
 
 const iconMap = {
   success: { icon: CheckCircle2, bg: 'bg-green-100', color: 'text-green-600' },
@@ -33,7 +34,9 @@ export default function MasyarakatNotifikasiPage() {
         setNotifications(result.data || [])
         setTotalPages(result.pagination?.total || 1)
       } catch (err: any) {
-        setError(err.message)
+        const errorMsg = err?.message || 'Gagal memuat notifikasi'
+        setError(errorMsg)
+        toast.error(errorMsg)
       } finally {
         setLoading(false)
       }

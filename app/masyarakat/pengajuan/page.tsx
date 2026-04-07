@@ -8,6 +8,7 @@ import { formatUTCDate } from '@/lib/utils'
 import { masyarakatService } from '@/services/masyarakat'
 import { StatusBadge } from '@/components/core/StatusBadge'
 import Link from 'next/link'
+import { toast } from 'sonner'
 
 export default function PengajuanPage() {
   const router = useRouter()
@@ -27,7 +28,9 @@ export default function PengajuanPage() {
         const result = await masyarakatService.getPengajuanStatus(token)
         setPengajuanStatus(result)
       } catch (err: any) {
-        setError(err.message)
+        const errorMsg = err?.message || 'Gagal memuat status pengajuan'
+        setError(errorMsg)
+        toast.error(errorMsg)
       } finally {
         setLoading(false)
       }
@@ -47,7 +50,9 @@ export default function PengajuanPage() {
       setPengajuanStatus(result)
       alert('Pengajuan berhasil disubmit!')
     } catch (err: any) {
-      setError(err.message)
+      const errorMsg = err?.message || 'Gagal mengirim pengajuan'
+      setError(errorMsg)
+      toast.error(errorMsg)
     } finally {
       setSubmitting(false)
     }

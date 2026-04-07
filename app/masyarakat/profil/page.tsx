@@ -2,7 +2,7 @@
 
 import { removeToken } from '@/actions/auth'
 import useAuthStore from '@/app/_stores/useAuthStore'
-import { User, MapPin, Briefcase, LogOut, ChevronRight, Edit2, Loader2, Home } from 'lucide-react'
+import { User, MapPin, Briefcase, LogOut, Edit2, Loader2, Home } from 'lucide-react'
 import Link from 'next/link'
 import { useTransition, useState, useEffect } from 'react'
 import { masyarakatService } from '@/services/masyarakat'
@@ -295,24 +295,6 @@ const ProfilPage = () => {
           </div>
         </div>
       )}
-
-      {/* Settings */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm divide-y divide-slate-50 mb-4">
-        {[
-          { label: 'Ubah Password', icon: '🔑' },
-          { label: 'Notifikasi & Pengaturan', icon: '🔔' },
-          { label: 'Bantuan & FAQ', icon: '❓' },
-          { label: 'Syarat & Ketentuan', icon: '📋' }
-        ].map((item) => (
-          <button
-            key={item.label}
-            className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-slate-50 transition-colors text-left">
-            <span className="text-lg">{item.icon}</span>
-            <span className="text-sm font-semibold text-slate-700">{item.label}</span>
-            <ChevronRight className="w-4 h-4 text-slate-300 ml-auto" />
-          </button>
-        ))}
-      </div>
 
       <button
         onClick={handleLogout}
