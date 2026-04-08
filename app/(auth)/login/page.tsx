@@ -71,9 +71,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-50 flex flex-col items-center justify-center p-4">
       {/* Logo */}
       <div className="flex flex-col items-center mb-8">
-        <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200 mb-4">
-          <Shield className="w-9 h-9 text-white" />
-        </div>
+        <img src="/images/logo.png" alt="Logo SIMPAN" className="w-16 h-16 rounded-xl object-cover" />
         <h1 className="text-2xl font-extrabold text-slate-800">SIMPAN</h1>
         <p className="text-slate-500 mt-1 text-center max-w-xs">Penyaluran Bantuan Sosial yang Tepat Sasaran</p>
       </div>

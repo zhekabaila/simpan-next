@@ -31,10 +31,6 @@ const nextConfig = {
             value: '1; mode=block'
           },
           {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin'
-          },
-          {
             key: 'Permissions-Policy',
             value: 'geolocation=(self), microphone=(), camera=()'
           }
@@ -68,4 +64,3 @@ const nextConfig = {
 }
 
 export default nextConfig
-

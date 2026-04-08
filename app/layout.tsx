@@ -44,13 +44,16 @@ export const metadata: Metadata = {
     'manajemen bantuan sosial',
     'aplikasi bantuan sosial'
   ],
+  icons: {
+    icon: '/images/logo.png',
+    apple: '/images/logo.png'
+  },
   applicationName: 'SIMPAN',
   authors: [{ name: 'SIMPAN Development Team' }],
   creator: 'SIMPAN',
   publisher: 'SIMPAN',
   category: 'Social Services',
   generator: 'Next.js',
-  referrer: 'strict-origin-when-cross-origin',
   robots: {
     index: true,
     follow: true,
@@ -68,7 +71,12 @@ export const metadata: Metadata = {
     siteName: 'SIMPAN',
     title: 'SIMPAN - Platform Penyaluran Bantuan Sosial Berbasis Digital',
     description:
-      'Sistem Informasi Penyaluran Bantuan (SIMPAN) mengintegrasikan seluruh proses bantuan sosial dengan teknologi QR Code untuk validasi real-time dan transparansi penuh. Hindari fraud dan pastikan bantuan tepat sasaran.'
+      'Sistem Informasi Penyaluran Bantuan (SIMPAN) mengintegrasikan seluruh proses bantuan sosial dengan teknologi QR Code untuk validasi real-time dan transparansi penuh. Hindari fraud dan pastikan bantuan tepat sasaran.',
+    images: [
+      {
+        url: 'https://simpan.coreapps.web.id/images/logo.png'
+      }
+    ]
   },
   twitter: {
     card: 'summary_large_image',
@@ -76,7 +84,12 @@ export const metadata: Metadata = {
     creator: '@simpan_bantuan',
     title: 'SIMPAN - Platform Penyaluran Bantuan Sosial',
     description:
-      'Sistem terintegrasi untuk penyaluran bantuan sosial dengan QR Code, verifikasi real-time, dan transparansi penuh. Mulai dari pendaftaran hingga distribusi dalam satu platform.'
+      'Sistem terintegrasi untuk penyaluran bantuan sosial dengan QR Code, verifikasi real-time, dan transparansi penuh. Mulai dari pendaftaran hingga distribusi dalam satu platform.',
+    images: [
+      {
+        url: 'https://simpan.coreapps.web.id/images/logo.png'
+      }
+    ]
   },
   manifest: '/manifest.json',
   appleWebApp: {
@@ -121,8 +134,7 @@ const jsonLd = {
       '@id': 'https://simpan.coreapps.web.id/#website',
       url: 'https://simpan.coreapps.web.id',
       name: 'SIMPAN - Sistem Informasi Penyaluran Bantuan Sosial',
-      description:
-        'Platform terintegrasi untuk penyaluran bantuan sosial dengan QR Code dan verifikasi real-time',
+      description: 'Platform terintegrasi untuk penyaluran bantuan sosial dengan QR Code dan verifikasi real-time',
       publisher: {
         '@id': 'https://simpan.coreapps.web.id/#organization'
       },
@@ -165,10 +177,7 @@ export default async function RootLayout({
   return (
     <html lang="id">
       <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>

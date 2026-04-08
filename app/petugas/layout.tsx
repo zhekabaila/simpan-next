@@ -24,9 +24,7 @@ export default function PetugasLayout({ children }: { children: React.ReactNode 
       {/* Topbar */}
       <header className="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-20">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center">
-            <Shield className="w-4.5 h-4.5 text-white" />
-          </div>
+          <img src="/images/logo.png" alt="Logo SIMPAN" className="w-8 h-8 rounded-xl object-cover" />
           <div>
             <span className="font-bold text-slate-800 text-sm">SIMPAN</span>
             <p className="text-xs text-slate-400">Petugas Lapangan</p>

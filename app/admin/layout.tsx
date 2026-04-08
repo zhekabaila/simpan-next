@@ -38,9 +38,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Logo */}
         <div className="px-5 py-5 border-b border-slate-100">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
+            <img src="/images/logo.png" alt="Logo SIMPAN" className="w-9 h-9 rounded-xl object-cover" />
             <div>
               <p className="font-bold text-slate-800 text-sm">SIMPAN</p>
               <p className="text-xs text-slate-400">Admin Panel</p>
@@ -91,9 +89,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Menu className="w-5 h-5 text-slate-600" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
-              <Shield className="w-4 h-4 text-white" />
-            </div>
+            <img src="/images/logo.png" alt="Logo SIMPAN" className="w-7 h-7 rounded-xl object-cover" />
             <span className="font-bold text-slate-800 text-sm">SIMPAN</span>
           </div>
         </header>

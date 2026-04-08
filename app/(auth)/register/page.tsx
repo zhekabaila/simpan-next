@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Eye, EyeOff, Shield, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Eye, EyeOff, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react'
 import useAuthStore from '@/app/_stores/useAuthStore'
 
 export default function RegisterPage() {
@@ -85,9 +85,7 @@ export default function RegisterPage() {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center">
-              <Shield className="w-4 h-4 text-white" />
-            </div>
+            <img src="/images/logo.png" alt="Logo SIMPAN" className="w-8 h-8 rounded-xl object-cover" />
             <span className="font-bold text-slate-800">SIMPAN</span>
           </div>
         </div>
