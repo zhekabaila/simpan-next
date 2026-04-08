@@ -23,7 +23,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { user } = useAuthStore()
 
-  const isActive = (to: string) => pathname === to
+  const isActive = (to: string) => pathname.includes(to)
 
   return (
     <div className="min-h-screen bg-slate-50 flex">

@@ -408,5 +408,27 @@ export const adminService = {
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to registrasi-by-admin')
     }
+  },
+
+  async registerPetugasByAdmin(
+    token: string,
+    data: {
+      nama: string
+      email: string
+      password: string
+      nomor_telepon: string
+      alamat?: string
+      latitude?: number
+      longitude?: number
+    }
+  ): Promise<any> {
+    try {
+      const response = await API.post('/admin/pengguna/buat-petugas', data, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      return response.data
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to create petugas')
+    }
   }
 }

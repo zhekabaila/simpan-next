@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Search, Loader2, MapPin, Navigation } from 'lucide-react'
 import 'leaflet/dist/leaflet.css'
+import { cn } from '@/lib/utils'
 
 interface LatLng {
   lat: number
@@ -20,6 +21,7 @@ interface LocationPickerProps {
   required?: boolean
   placeholder?: string
   addressPlaceholder?: string
+  className?: string
 }
 
 interface NominatimResult {
@@ -69,7 +71,8 @@ export function LocationPicker({
   onChange,
   disabled = false,
   required = false,
-  addressPlaceholder = 'Cari alamat...'
+  addressPlaceholder = 'Cari alamat...',
+  className
 }: LocationPickerProps) {
   const [coordinates, setCoordinates] = useState<LatLng>({
     lat: value?.lat || -6.2,
@@ -388,7 +391,7 @@ export function LocationPicker({
       </div>
 
       {/* Map */}
-      <div className="w-full aspect-square rounded-md overflow-hidden border relative">
+      <div className={cn('w-full aspect-square rounded-md overflow-hidden border relative', className)}>
         <MapContainer
           key={mapKey}
           center={[coordinates.lat, coordinates.lng]}

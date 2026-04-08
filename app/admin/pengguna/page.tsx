@@ -135,13 +135,27 @@ export default function PenggunaPage() {
     }
   }
 
-  const handleCreateUser = async (data: any) => {
+  const handleCreateUser = async (data: any, role: 'masyarakat' | 'petugas') => {
     if (!token) return
     try {
-      await adminService.registerUserByAdmin(token, {
-        ...data,
-        role: 'masyarakat'
-      })
+      if (role === 'petugas') {
+        // Call petugas endpoint with optional fields
+        await adminService.registerPetugasByAdmin(token, {
+          nama: data.nama,
+          email: data.email,
+          password: data.password,
+          nomor_telepon: data.nomor_telepon,
+          alamat: data.alamat,
+          latitude: data.latitude,
+          longitude: data.longitude
+        })
+      } else {
+        // Call masyarakat endpoint
+        await adminService.registerUserByAdmin(token, {
+          ...data,
+          role: 'masyarakat'
+        })
+      }
       toast.success('Pengguna berhasil ditambahkan')
       // Refresh list
       const result = await adminService.getDaftarPengguna(
@@ -149,7 +163,6 @@ export default function PenggunaPage() {
         parsedPage,
         parsedLimit,
         parsedRole !== 'semua' ? parsedRole : undefined
-        // qParam || undefined
       )
       if (result.data) setUsers(result.data)
     } catch (err: any) {
