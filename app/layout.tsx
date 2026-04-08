@@ -61,10 +61,6 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://simpan.coreapps.web.id'
   },
-  icons: {
-    icon: '/images/logo.png',
-    apple: '/images/logo.png'
-  },
   openGraph: {
     type: 'website',
     locale: 'id_ID',
@@ -72,16 +68,7 @@ export const metadata: Metadata = {
     siteName: 'SIMPAN',
     title: 'SIMPAN - Platform Penyaluran Bantuan Sosial Berbasis Digital',
     description:
-      'Sistem Informasi Penyaluran Bantuan (SIMPAN) mengintegrasikan seluruh proses bantuan sosial dengan teknologi QR Code untuk validasi real-time dan transparansi penuh. Hindari fraud dan pastikan bantuan tepat sasaran.',
-    images: [
-      {
-        url: 'https://simpan.coreapps.web.id/images/logo.png',
-        width: 1200,
-        height: 630,
-        alt: 'SIMPAN - Platform Penyaluran Bantuan Sosial',
-        type: 'image/png'
-      }
-    ]
+      'Sistem Informasi Penyaluran Bantuan (SIMPAN) mengintegrasikan seluruh proses bantuan sosial dengan teknologi QR Code untuk validasi real-time dan transparansi penuh. Hindari fraud dan pastikan bantuan tepat sasaran.'
   },
   twitter: {
     card: 'summary_large_image',
@@ -89,8 +76,7 @@ export const metadata: Metadata = {
     creator: '@simpan_bantuan',
     title: 'SIMPAN - Platform Penyaluran Bantuan Sosial',
     description:
-      'Sistem terintegrasi untuk penyaluran bantuan sosial dengan QR Code, verifikasi real-time, dan transparansi penuh. Mulai dari pendaftaran hingga distribusi dalam satu platform.',
-    images: ['https://simpan.coreapps.web.id/images/logo.png']
+      'Sistem terintegrasi untuk penyaluran bantuan sosial dengan QR Code, verifikasi real-time, dan transparansi penuh. Mulai dari pendaftaran hingga distribusi dalam satu platform.'
   },
   manifest: '/manifest.json',
   appleWebApp: {
