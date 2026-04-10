@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
 // Public routes that don't require authentication
-const PUBLIC_ROUTES = ['/login', '/register']
+const PUBLIC_ROUTES = ['/login', '/register', '/']
 
 // Role-based route mapping
 const ROLE_ROUTES: Record<string, string> = {
@@ -26,7 +26,7 @@ function getRequiredRoleForPath(pathname: string): string | null {
   return null
 }
 
-const shouldRedirectRoute = ['/', '/masyarakat', '/petugas', '/admin']
+const shouldRedirectRoute = ['/masyarakat', '/petugas', '/admin']
 
 export async function proxy(request: NextRequest) {
   const c = await cookies()
