@@ -1,14 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
-// Public routes that don't require authentication
-const PUBLIC_ROUTES = ['/login', '/register', '/']
+// Auth routes - login/register pages
+const AUTH_ROUTES = ['/login', '/register']
+
+// Landing page - accessible to everyone (authenticated or not)
+const LANDING_ROUTES = ['/']
+
+// All public routes (auth + landing combined)
+const PUBLIC_ROUTES = [...AUTH_ROUTES, ...LANDING_ROUTES]
 
 // Role-based route mapping
 const ROLE_ROUTES: Record<string, string> = {
   admin: '/admin/dashboard',
   petugas: '/petugas/dashboard',
   masyarakat: '/masyarakat/dashboard'
+}
+
+function isAuthRoute(pathname: string): boolean {
+  return AUTH_ROUTES.some((route) => pathname.startsWith(route))
+}
+
+function isLandingRoute(pathname: string): boolean {
+  return LANDING_ROUTES.some((route) => pathname.startsWith(route))
 }
 
 function isPublicRoute(pathname: string): boolean {
@@ -56,14 +70,26 @@ export async function proxy(request: NextRequest) {
 
   // Case 2: Has token
 
-  // Case 2a: Logged in user accessing public routes (auth pages)
-  if (isPublic) {
+  // Case 2a: Logged in user accessing auth routes (login/register)
+  if (isAuthRoute(pathname)) {
     // Redirect to dashboard based on role
     const defaultPath = getRoleBasedPath(role)
     return NextResponse.redirect(new URL(defaultPath, request.url))
   }
 
-  // Case 2b: Check role-based access for protected routes
+  // Case 2b: Logged in user accessing landing page
+  if (isLandingRoute(pathname)) {
+    // Allow access - users can still view the landing page
+    return NextResponse.next()
+  }
+
+  // Case 2c: Logged in user accessing other public routes
+  if (isPublic) {
+    // Allow access
+    return NextResponse.next()
+  }
+
+  // Case 2d: Check role-based access for protected routes
   const requiredRole = getRequiredRoleForPath(pathname)
   if (requiredRole && role && role !== requiredRole) {
     // User is trying to access a route that requires a different role

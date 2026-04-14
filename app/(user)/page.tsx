@@ -20,7 +20,6 @@ import {
   FileCheck,
   Smartphone,
   Globe,
-  Award,
   Clock,
   TrendingUp,
   UserCheck,
@@ -83,9 +82,7 @@ function Navbar() {
         <div className="flex items-center justify-between h-16 lg:h-18">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-[#2563EB] rounded-xl flex items-center justify-center shadow-sm">
-              <QrCode className="w-5 h-5 text-white" />
-            </div>
+            <img src="/images/logo.png" alt="Logo SIMPAN" className="w-9 h-9 rounded-xl object-cover" />
             <span
               className={`font-bold tracking-tight transition-colors ${scrolled ? 'text-[#1E293B]' : 'text-white'}`}
               style={{ fontSize: '1.125rem' }}>
