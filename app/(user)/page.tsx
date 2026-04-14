@@ -191,11 +191,6 @@ function HeroSection() {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left — Text */}
           <div className="text-white">
-            <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-6">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-sm text-white/90">Sistem Resmi Pemerintah Indonesia</span>
-            </div>
-
             <h1
               className="text-white mb-4"
               style={{ fontSize: 'clamp(2rem, 5vw, 3.25rem)', fontWeight: 700, lineHeight: 1.2 }}>
@@ -220,20 +215,6 @@ function HeroSection() {
                 <Eye className="w-4 h-4" />
                 Lihat Cara Kerja
               </a>
-            </div>
-
-            {/* Trust badges */}
-            <div className="flex flex-wrap items-center gap-4">
-              {[
-                { icon: Shield, text: 'Data Terenkripsi' },
-                { icon: Award, text: 'Sistem Terverifikasi' },
-                { icon: Globe, text: 'Seluruh Indonesia' }
-              ].map((badge) => (
-                <div key={badge.text} className="flex items-center gap-2 text-white/70">
-                  <badge.icon className="w-4 h-4" />
-                  <span className="text-sm">{badge.text}</span>
-                </div>
-              ))}
             </div>
           </div>
 
@@ -307,7 +288,7 @@ function HeroSection() {
                 </div>
                 <span className="text-[#1E293B] text-xs font-semibold">Scan Berhasil</span>
               </div>
-              <p className="text-[#64748B] text-xs">Siti Rahayu</p>
+              <p className="text-[#64748B] text-xs">Shafa Rabbani</p>
               <p className="text-[#64748B] text-xs">3275 ************</p>
               <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                 <div className="h-full w-4/5 bg-green-500 rounded-full" />
@@ -326,14 +307,6 @@ function HeroSection() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
-          <span className="text-white/40 text-xs">Scroll ke bawah</span>
-          <div>
-            <ChevronDown className="w-5 h-5 text-white/40" />
           </div>
         </div>
       </div>
