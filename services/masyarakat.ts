@@ -118,9 +118,13 @@ export const masyarakatService = {
 
   async submitPengajuan(token: string): Promise<any> {
     try {
-      const response = await API.post('/masyarakat/pengajuan', {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      const response = await API.post(
+        '/masyarakat/pengajuan',
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      )
       return response.data
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to submit pengajuan')
@@ -163,9 +167,13 @@ export const masyarakatService = {
 
   async markNotifikasiRead(token: string, id: string): Promise<any> {
     try {
-      const response = await API.patch(`/masyarakat/notifikasi/${id}/baca`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      const response = await API.patch(
+        `/masyarakat/notifikasi/${id}/baca`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      )
       return response.data
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to mark as read')
@@ -174,12 +182,31 @@ export const masyarakatService = {
 
   async markAllNotifikasiRead(token: string): Promise<any> {
     try {
-      const response = await API.patch('/masyarakat/notifikasi/baca-semua', {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      const response = await API.patch(
+        '/masyarakat/notifikasi/baca-semua',
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      )
       return response.data
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to mark all as read')
+    }
+  },
+
+  async resetPassword(token: string, userId: string, password: string): Promise<any> {
+    try {
+      const response = await API.patch(
+        `/pengguna/${userId}/reset-password`,
+        { password },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      )
+      return response.data
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Gagal mereset password')
     }
   }
 }

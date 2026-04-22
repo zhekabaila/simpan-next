@@ -2,14 +2,15 @@
 
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { Home, QrCode, ClipboardList, Shield } from 'lucide-react'
+import { Home, QrCode, ClipboardList, User } from 'lucide-react'
 import useAuthStore from '@/app/_stores/useAuthStore'
 import { LogoutButton } from '@/components/core/LogoutButton'
 
 const bottomNav = [
   { to: '/petugas/dashboard', icon: Home, label: 'Beranda' },
   { to: '/petugas/scan', icon: QrCode, label: 'Scan QR' },
-  { to: '/petugas/riwayat', icon: ClipboardList, label: 'Riwayat' }
+  { to: '/petugas/riwayat', icon: ClipboardList, label: 'Riwayat' },
+  { to: '/petugas/profil', icon: User, label: 'Profil' }
 ]
 
 export default function PetugasLayout({ children }: { children: React.ReactNode }) {

@@ -387,7 +387,7 @@ export function LocationPicker({
 
       {/* Coordinates Display */}
       <div className="text-xs text-slate-500">
-        Lat: {coordinates.lat.toFixed(6)} | Lng: {coordinates.lng.toFixed(6)}
+        Lat: {Number(coordinates.lat).toFixed(6)} | Lng: {Number(coordinates.lng).toFixed(6)}
       </div>
 
       {/* Map */}

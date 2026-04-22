@@ -2,11 +2,12 @@
 
 import { removeToken } from '@/actions/auth'
 import useAuthStore from '@/app/_stores/useAuthStore'
-import { User, MapPin, Briefcase, LogOut, Edit2, Loader2, Home } from 'lucide-react'
+import { User, MapPin, Briefcase, LogOut, Edit2, Loader2, Home, Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useTransition, useState, useEffect } from 'react'
 import { masyarakatService } from '@/services/masyarakat'
 import ImageViewer from '@/components/core/image-viewer'
+import ResetPasswordDialog from '@/components/dialogs/reset-password-dialog'
 import { formatUTCDate } from '@/lib/utils'
 
 interface ProfileData {
@@ -47,6 +48,8 @@ const ProfilPage = () => {
   const { logout, isLoading, token, user } = useAuthStore()
   const [profileData, setProfileData] = useState<ProfileData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [resetPasswordOpen, setResetPasswordOpen] = useState(false)
+  const [resetLoading, setResetLoading] = useState(false)
 
   useEffect(() => {
     if (!token) return
@@ -85,6 +88,19 @@ const ProfilPage = () => {
       })
     } catch (error) {
       console.error('Logout failed:', error)
+    }
+  }
+
+  const handleResetPassword = async (password: string) => {
+    if (!token || !user?.id) {
+      throw new Error('User tidak terautentikasi')
+    }
+
+    setResetLoading(true)
+    try {
+      await masyarakatService.resetPassword(token, user.id, password)
+    } finally {
+      setResetLoading(false)
     }
   }
 
@@ -296,12 +312,30 @@ const ProfilPage = () => {
         </div>
       )}
 
+      {/* Reset Password Button */}
+      <button
+        onClick={() => setResetPasswordOpen(true)}
+        disabled={saving || isLoading}
+        className="w-full flex items-center justify-center gap-2 py-3 bg-blue-50 text-blue-600 font-semibold rounded-xl hover:bg-blue-100 transition-colors disabled:opacity-60 mb-3">
+        <Lock className="w-4 h-4" />
+        Reset Password
+      </button>
+
       <button
         onClick={handleLogout}
         className="w-full flex items-center justify-center gap-2 py-3 bg-red-50 text-red-500 font-semibold rounded-xl hover:bg-red-100 transition-colors">
         <LogOut className="w-4 h-4" />
         Keluar
       </button>
+
+      {/* Reset Password Dialog */}
+      <ResetPasswordDialog
+        open={resetPasswordOpen}
+        onOpenChange={setResetPasswordOpen}
+        onSubmit={handleResetPassword}
+        isLoading={resetLoading}
+        userId={user?.id}
+      />
     </div>
   )
 }

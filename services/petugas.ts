@@ -24,6 +24,36 @@ export interface RiwayatDistribusi {
 }
 
 export const petugasService = {
+  async getProfil(token: string): Promise<any> {
+    try {
+      const response = await API.get('/petugas/profil', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      return response.data
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to get profil')
+    }
+  },
+
+  async updateProfil(
+    token: string,
+    data: { nomor_telepon?: string; alamat?: string; latitude?: number; longitude?: number }
+  ): Promise<any> {
+    try {
+      const response = await API.post('/petugas/profil', data, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      return response.data
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Gagal menyimpan profil'
+      const errorData = error.response?.data?.errors || {}
+
+      const err = new Error(errorMessage)
+      ;(err as any).errors = errorData
+      throw err
+    }
+  },
+
   async getDaftarPenugasan(token: string, page: number = 1, limit: number = 10): Promise<any> {
     try {
       const response = await API.get('/petugas/penugasan', {
@@ -81,6 +111,21 @@ export const petugasService = {
       return response.data
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to get riwayat distribusi')
+    }
+  },
+
+  async resetPassword(token: string, userId: string, password: string): Promise<any> {
+    try {
+      const response = await API.patch(
+        `/pengguna/${userId}/reset-password`,
+        { password },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      )
+      return response.data
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Gagal mereset password')
     }
   }
 }

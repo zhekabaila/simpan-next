@@ -116,7 +116,7 @@ function Navbar() {
               Masuk
             </Link>
             <Link
-              href="/daftar"
+              href="/register"
               className="px-5 py-2 bg-[#2563EB] text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm">
               Daftar Sekarang
             </Link>
@@ -153,7 +153,7 @@ function Navbar() {
                 Masuk
               </Link>
               <Link
-                href="/daftar"
+                href="/register"
                 className="px-4 py-3 bg-[#2563EB] text-white rounded-lg text-sm font-medium text-center hover:bg-blue-700 transition-colors">
                 Daftar Sekarang
               </Link>
@@ -201,7 +201,7 @@ function HeroSection() {
 
             <div className="flex flex-col sm:flex-row gap-3 mb-10">
               <Link
-                href="/daftar"
+                href="/register"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white text-[#2563EB] rounded-xl font-semibold hover:bg-blue-50 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
                 Daftar Sebagai Masyarakat
                 <ArrowRight className="w-4 h-4" />
@@ -568,7 +568,7 @@ function HowItWorksSection() {
       </div>
 
       {/* Steps */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-7xl mx-auto">
         {active.steps.map((step, i) => (
           <div key={step.step} className="relative">
             {/* Connector line */}
@@ -614,7 +614,7 @@ function UserRolesSection() {
         'Riwayat penerimaan bantuan'
       ],
       cta: 'Daftar Sekarang',
-      link: '/daftar',
+      link: '/register',
       image: 'https://images.unsplash.com/photo-1722252799188-87e1db708544?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400'
     },
     {
@@ -1014,7 +1014,7 @@ function CTASection() {
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
-                href="/daftar"
+                href="/register"
                 className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-white text-[#2563EB] rounded-xl font-semibold hover:bg-blue-50 transition-all shadow-lg">
                 Daftar Sebagai Masyarakat
                 <ArrowRight className="w-4 h-4" />
@@ -1058,7 +1058,7 @@ function Footer() {
       { label: 'FAQ', href: '#faq' }
     ],
     Pengguna: [
-      { label: 'Daftar Masyarakat', href: '/daftar' },
+      { label: 'Daftar Masyarakat', href: '/register' },
       { label: 'Login', href: '/login' },
       { label: 'Portal Petugas', href: '/login' },
       { label: 'Portal Admin', href: '/login' }
@@ -1141,7 +1141,7 @@ export default function LandingPage() {
     <div className="min-h-screen">
       <Navbar />
       <HeroSection />
-      <StatsSection />
+      {/* <StatsSection /> */}
       <FeaturesSection />
       <HowItWorksSection />
       <UserRolesSection />

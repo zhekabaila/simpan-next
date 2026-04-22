@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Eye, EyeOff, Shield, Users, HardHat, ShieldCheck, AlertCircle } from 'lucide-react'
+import { Eye, EyeOff, Users, HardHat, ShieldCheck, AlertCircle, ArrowLeft } from 'lucide-react'
 import useAuthStore from '@/app/_stores/useAuthStore'
 import { ROLES } from '@/lib/config'
 import { saveToken } from '@/actions/auth'
@@ -73,10 +73,19 @@ export default function LoginPage() {
       <div className="flex flex-col items-center mb-8">
         <img src="/images/logo.png" alt="Logo SIMPAN" className="w-16 h-16 rounded-xl object-cover" />
         <h1 className="text-2xl font-extrabold text-slate-800">SIMPAN</h1>
-        <p className="text-slate-500 mt-1 text-center max-w-xs">Penyaluran Bantuan Sosial yang Tepat Sasaran</p>
+        <p className="text-slate-500 mt-1 text-center max-w-xs">Sistem Informasi Penyaluran Bantuan</p>
       </div>
 
       <div className="bg-white rounded-2xl shadow-xl shadow-slate-100 border border-slate-100 w-full max-w-md p-6">
+        {/* Back Button */}
+        <button
+          onClick={() => router.push('/')}
+          className="mb-4 p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-600 hover:text-slate-800 flex items-center gap-2"
+          title="Kembali ke halaman utama">
+          <ArrowLeft className="w-5 h-5" />
+          <span className="text-sm font-medium">Kembali</span>
+        </button>
+
         <form onSubmit={handleLogin} className="space-y-4">
           {/* Error Messages */}
           {(localError || error) && (
