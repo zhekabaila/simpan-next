@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { QrCode, MapPin, Users, CheckCircle2, Clock, AlertCircle } from 'lucide-react'
+import { QrCode, MapPin, Users, CheckCircle2, Clock, AlertCircle, Upload } from 'lucide-react'
 import { StatusBadge } from '@/components/core/StatusBadge'
+import { UploadDokumentasiDialog } from '@/components/dialogs/upload-dokumentasi-dialog'
+import ImageViewer from '@/components/core/image-viewer'
 import useAuthStore from '@/app/_stores/useAuthStore'
 import { petugasService } from '@/services/petugas'
 import { toast } from 'sonner'
@@ -13,8 +15,11 @@ export default function PetugasDashboardPage() {
   const { user, token } = useAuthStore()
   const [assignment, setAssignment] = useState<any>(null)
   const [recentScans, setRecentScans] = useState<any[]>([])
+  const [recentDokumentasi, setRecentDokumentasi] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
+  const [uploadLoading, setUploadLoading] = useState(false)
 
   useEffect(() => {
     if (!token) return
@@ -24,13 +29,22 @@ export default function PetugasDashboardPage() {
         // Fetch assignments
         const assignmentResult = await petugasService.getDaftarPenugasan(token, 1, 1)
         if (assignmentResult.data && assignmentResult.data.length > 0) {
-          setAssignment(assignmentResult.data[0])
-        }
+          const activeAssignment = assignmentResult.data.find((e: any) => e?.periode?.status === 'aktif')
+          setAssignment(activeAssignment)
 
-        // Fetch recent scans for this assignment
-        const scansResult = await petugasService.getRiwayatDistribusi(token, 1, 4)
-        if (scansResult.data) {
-          setRecentScans(scansResult.data)
+          // Fetch recent scans for this assignment
+          const scansResult = await petugasService.getRiwayatDistribusi(token, 1, 4)
+          if (scansResult.data) {
+            setRecentScans(scansResult.data)
+          }
+
+          // Fetch recent dokumentasi for this assignment
+          if (activeAssignment) {
+            const dokResult = await petugasService.getDokumentasiByPeriode(token, activeAssignment.periode_bansos_id, 1, 4)
+            if (dokResult.data) {
+              setRecentDokumentasi(dokResult.data)
+            }
+          }
         }
       } catch (err: any) {
         const errorMsg = err?.message || 'Gagal memuat dashboard'
@@ -43,6 +57,37 @@ export default function PetugasDashboardPage() {
 
     fetchData()
   }, [token])
+
+  const handleUploadDokumentasi = async (jenis_dokumentasi: 'foto' | 'catatan', file: File | null, keterangan: string) => {
+    if (!token || !assignment) {
+      throw new Error('Data tidak lengkap')
+    }
+
+    setUploadLoading(true)
+    try {
+      const result = await petugasService.uploadDokumentasi(
+        token,
+        assignment.periode_bansos_id,
+        jenis_dokumentasi,
+        file,
+        keterangan
+      )
+
+      toast.success('Dokumentasi berhasil diupload!', {
+        description: `Dokumentasi ${jenis_dokumentasi} telah disimpan`,
+        duration: 2000
+      })
+    } catch (err: any) {
+      const errorMsg = err?.message || 'Gagal mengupload dokumentasi'
+      toast.error('Error', {
+        description: errorMsg,
+        duration: 3000
+      })
+      throw err
+    } finally {
+      setUploadLoading(false)
+    }
+  }
 
   if (error) {
     return (
@@ -192,6 +237,15 @@ export default function PetugasDashboardPage() {
         <span className="text-base">Mulai Scan QR Code</span>
       </button>
 
+      {/* Upload Dokumentasi Button */}
+      <button
+        onClick={() => setUploadDialogOpen(true)}
+        disabled={!assignment || assignment.periode.status !== 'aktif'}
+        className="w-full py-4 bg-green-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-green-700 text-white font-bold rounded-2xl transition-all flex items-center justify-center gap-3 shadow-lg shadow-green-200 mb-4">
+        <Upload className="w-6 h-6" />
+        <span className="text-base">Upload Dokumentasi</span>
+      </button>
+
       {/* Recent Scans */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
         <div className="flex items-center justify-between mb-4">
@@ -231,6 +285,79 @@ export default function PetugasDashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Recent Dokumentasi */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mt-4">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-bold text-slate-800">Dokumentasi Terakhir</h2>
+          <button
+            onClick={() => router.push('/petugas/dokumentasi')}
+            className="text-sm text-blue-600 font-semibold hover:underline">
+            Lihat semua
+          </button>
+        </div>
+        {recentDokumentasi.length === 0 ? (
+          <div className="text-center py-6">
+            <p className="text-slate-400 text-sm">Belum ada dokumentasi</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {recentDokumentasi.map((dok, i) => {
+              const dokTime = new Date(dok.diunggah_pada).toLocaleTimeString('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit'
+              })
+              const dokDate = new Date(dok.diunggah_pada).toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: 'short'
+              })
+              const isFoto = dok.jenis_dokumentasi === 'foto' && dok.path_dokumentasi
+
+              return (
+                <div key={i} className="flex items-center gap-3 py-2 border-b border-slate-50 last:border-0">
+                  {isFoto ? (
+                    <ImageViewer
+                      src={dok.path_dokumentasi}
+                      alt={`Dokumentasi ${dokDate}`}
+                      fileName={`dokumentasi-${dok.id}.jpg`}
+                      className="w-12 h-12 rounded-xl flex-shrink-0"
+                      hideOverlay={true}>
+                      <div className="w-12 h-12 bg-gray-200 rounded-xl overflow-hidden flex items-center justify-center">
+                        <img
+                          src={dok.path_dokumentasi}
+                          alt={`Dokumentasi ${dokDate}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </ImageViewer>
+                  ) : (
+                    <div className="w-9 h-9 bg-green-100 rounded-xl flex items-center justify-center text-sm font-bold text-green-600 flex-shrink-0">
+                      📝
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-slate-800 capitalize">{dok.jenis_dokumentasi}</p>
+                    <p className="text-xs text-slate-400">
+                      {dokDate} · {dokTime}
+                    </p>
+                  </div>
+                  <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full font-medium whitespace-nowrap">
+                    {dok.jenis_dokumentasi === 'foto' ? 'Foto' : 'Catatan'}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Upload Dokumentasi Dialog */}
+      <UploadDokumentasiDialog
+        open={uploadDialogOpen}
+        onOpenChange={setUploadDialogOpen}
+        onSubmit={handleUploadDokumentasi}
+        isLoading={uploadLoading}
+      />
     </div>
   )
 }

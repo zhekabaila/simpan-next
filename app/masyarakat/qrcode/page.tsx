@@ -34,7 +34,7 @@ export default function QRCodePage() {
         if (statusResult && statusResult.status === 'disetujui') {
           try {
             const qrResult = await masyarakatService.getQRCode(token)
-            setQRCode(qrResult.data)
+          setQRCode(qrResult.data)
           } catch (err) {
             setError('QR Code belum tersedia. Silakan coba kembali nanti.')
           }

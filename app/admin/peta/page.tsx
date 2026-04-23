@@ -5,6 +5,7 @@ import { AlertCircle, Loader2, Check, Clock } from 'lucide-react'
 import useAuthStore from '@/app/_stores/useAuthStore'
 import { adminService } from '@/services/admin'
 import { LocationViewer, type LocationMarker } from '@/components/core/location-viewer'
+import ImageViewer from '@/components/core/image-viewer'
 import { toast } from 'sonner'
 import { formatUTCDate } from '@/lib/utils'
 
@@ -20,6 +21,7 @@ export default function MonitoringPetaPage() {
   const [error, setError] = useState('')
   const [filterStatus, setFilterStatus] = useState<'semua' | 'sudah_menerima' | 'belum_menerima'>('semua')
   const [apiStatistics, setApiStatistics] = useState<any>(null)
+  const [dokumentasi, setDokumentasi] = useState<any[]>([])
 
   // Fetch periods on mount
   useEffect(() => {
@@ -69,6 +71,16 @@ export default function MonitoringPetaPage() {
           // Set statistics from API
           if (result.statistik) {
             setApiStatistics(result.statistik)
+          }
+
+          // Fetch dokumentasi by periode
+          try {
+            const dokResult = await adminService.getDokumentasiByPeriode(token, selectedPeriode, 1, 10)
+            if (dokResult.data) {
+              setDokumentasi(dokResult.data)
+            }
+          } catch (dokErr: any) {
+            console.error('Gagal memuat dokumentasi:', dokErr)
           }
         }
       } catch (err: any) {
@@ -286,6 +298,90 @@ export default function MonitoringPetaPage() {
             <p className="text-slate-600">
               Tidak ada penerima dengan status {filterStatus === 'semua' ? 'apapun' : filterStatus}
             </p>
+          </div>
+        )}
+      </div>
+
+      {/* Dokumentasi Section */}
+      <div>
+        <h2 className="text-lg font-bold text-slate-800 mb-4">Dokumentasi ({dokumentasi.length})</h2>
+
+        {dokumentasi.length === 0 ? (
+          <div className="bg-slate-50 rounded-xl border border-slate-100 p-8 text-center">
+            <p className="text-slate-600 font-semibold">Belum ada dokumentasi</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {dokumentasi.map((dok, i) => {
+              const dokTime = new Date(dok.diunggah_pada).toLocaleTimeString('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit'
+              })
+              const dokDate = new Date(dok.diunggah_pada).toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: 'short'
+              })
+              const isFoto = dok.jenis_dokumentasi === 'foto' && dok.path_dokumentasi
+
+              return (
+                <div
+                  key={i}
+                  className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 hover:shadow-md transition-shadow">
+                  {/* Thumbnail */}
+                  <div className="mb-4">
+                    {isFoto ? (
+                      <ImageViewer
+                        src={dok.path_dokumentasi}
+                        alt={`Dokumentasi ${dokDate}`}
+                        fileName={`dokumentasi-${dok.id}.jpg`}
+                        className="w-full h-48 rounded-xl flex-shrink-0"
+                        hideOverlay={true}>
+                        <div className="w-full h-48 bg-gray-200 rounded-xl overflow-hidden flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors">
+                          <img
+                            src={dok.path_dokumentasi}
+                            alt={`Dokumentasi ${dokDate}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </ImageViewer>
+                    ) : (
+                      <div className="w-full h-48 bg-green-50 border-2 border-green-200 rounded-xl flex items-center justify-center text-6xl">
+                        📝
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <p className="text-sm font-semibold text-slate-800 capitalize">{dok.jenis_dokumentasi}</p>
+                        <span className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded-full font-medium">
+                          {dok.jenis_dokumentasi === 'foto' ? 'Foto' : 'Catatan'}
+                        </span>
+                      </div>
+                      {dok.petugas?.nama && (
+                        <p className="text-xs text-slate-600 mb-2">
+                          <span className="font-medium">Oleh:</span> {dok.petugas.nama}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="border-t border-slate-100 pt-3">
+                      <p className="text-xs text-slate-400 font-medium">
+                        {dokDate} · {dokTime}
+                      </p>
+                    </div>
+
+                    {dok.keterangan && (
+                      <div className="bg-slate-50 rounded-lg p-3 border border-slate-100">
+                        <p className="text-xs text-slate-600">{dok.keterangan}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
           </div>
         )}
       </div>

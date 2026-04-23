@@ -195,6 +195,18 @@ export const masyarakatService = {
     }
   },
 
+  async getDistribusi(token: string, page: number = 1, limit: number = 15): Promise<any> {
+    try {
+      const response = await API.get('/masyarakat/distribusi', {
+        params: { page, limit },
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      return response.data
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to get distribusi')
+    }
+  },
+
   async resetPassword(token: string, userId: string, password: string): Promise<any> {
     try {
       const response = await API.patch(
