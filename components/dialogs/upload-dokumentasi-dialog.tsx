@@ -10,17 +10,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import { Upload, FileText, Image as ImageIcon, AlertCircle, Loader2 } from 'lucide-react'
+import { Upload, Image as ImageIcon, AlertCircle, Loader2 } from 'lucide-react'
 
 interface UploadDokumentasiDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSubmit: (jenis_dokumentasi: 'foto' | 'catatan', file: File | null, keterangan: string) => Promise<void>
+  onSubmit: (jenis_dokumentasi: 'foto', file: File | null, keterangan: string) => Promise<void>
   isLoading: boolean
 }
 
 export function UploadDokumentasiDialog({ open, onOpenChange, onSubmit, isLoading }: UploadDokumentasiDialogProps) {
-  const [jenis, setJenis] = useState<'foto' | 'catatan'>('foto')
+  const jenis = 'foto' // Only foto is allowed
   const [file, setFile] = useState<File | null>(null)
   const [fileName, setFileName] = useState('')
   const [keterangan, setKeterangan] = useState('')
@@ -59,8 +59,8 @@ export function UploadDokumentasiDialog({ open, onOpenChange, onSubmit, isLoadin
 
   const handleSubmit = async () => {
     // Validate
-    if (jenis === 'foto' && !file) {
-      setError('Foto harus diupload jika jenis dokumentasi adalah foto')
+    if (!file) {
+      setError('Foto harus diupload')
       return
     }
 
@@ -72,7 +72,6 @@ export function UploadDokumentasiDialog({ open, onOpenChange, onSubmit, isLoadin
     try {
       await onSubmit(jenis, file, keterangan)
       // Reset form
-      setJenis('foto')
       setFile(null)
       setFileName('')
       setKeterangan('')
@@ -89,77 +88,40 @@ export function UploadDokumentasiDialog({ open, onOpenChange, onSubmit, isLoadin
       <AlertDialogContent className="max-w-md">
         <AlertDialogHeader>
           <AlertDialogTitle>Upload Dokumentasi</AlertDialogTitle>
-          <AlertDialogDescription>Upload foto atau catatan dokumentasi distribusi bansos Anda</AlertDialogDescription>
+          <AlertDialogDescription>Upload foto dokumentasi distribusi bansos Anda</AlertDialogDescription>
         </AlertDialogHeader>
 
         <div className="space-y-4 py-4">
-          {/* Jenis Dokumentasi */}
+          {/* File Upload */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Jenis Dokumentasi</label>
-            <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  setJenis('foto')
-                  setError('')
-                }}
-                className={`flex-1 flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 transition-all ${
-                  jenis === 'foto'
-                    ? 'border-blue-500 bg-blue-50 text-blue-700'
-                    : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
-                }`}>
-                <ImageIcon className="w-4 h-4" />
-                <span className="text-sm font-medium">Foto</span>
-              </button>
-              <button
-                onClick={() => {
-                  setJenis('catatan')
-                  setFile(null)
-                  setFileName('')
-                  setError('')
-                }}
-                className={`flex-1 flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 transition-all ${
-                  jenis === 'catatan'
-                    ? 'border-blue-500 bg-blue-50 text-blue-700'
-                    : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
-                }`}>
-                <FileText className="w-4 h-4" />
-                <span className="text-sm font-medium">Catatan</span>
-              </button>
-            </div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Foto <span className="text-red-500">*</span>
+            </label>
+            <label className="block">
+              <div className="border-2 border-dashed border-slate-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                {fileName ? (
+                  <div className="space-y-1">
+                    <ImageIcon className="w-6 h-6 text-blue-500 mx-auto" />
+                    <p className="text-sm font-medium text-slate-700">{fileName}</p>
+                    <p className="text-xs text-slate-500">Klik untuk ubah foto</p>
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    <Upload className="w-6 h-6 text-slate-400 mx-auto" />
+                    <p className="text-sm font-medium text-slate-700">Pilih foto</p>
+                    <p className="text-xs text-slate-500">Max 5MB • JPEG, PNG, GIF</p>
+                  </div>
+                )}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif"
+                  onChange={handleFileChange}
+                  className="hidden"
+                  disabled={isLoading}
+                />
+              </div>
+            </label>
           </div>
-
-          {/* File Upload (if Foto selected) */}
-          {jenis === 'foto' && (
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Foto <span className="text-red-500">*</span>
-              </label>
-              <label className="block">
-                <div className="border-2 border-dashed border-slate-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
-                  {fileName ? (
-                    <div className="space-y-1">
-                      <ImageIcon className="w-6 h-6 text-blue-500 mx-auto" />
-                      <p className="text-sm font-medium text-slate-700">{fileName}</p>
-                      <p className="text-xs text-slate-500">Klik untuk ubah foto</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-1">
-                      <Upload className="w-6 h-6 text-slate-400 mx-auto" />
-                      <p className="text-sm font-medium text-slate-700">Pilih foto</p>
-                      <p className="text-xs text-slate-500">Max 5MB • JPEG, PNG, GIF</p>
-                    </div>
-                  )}
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/gif"
-                    onChange={handleFileChange}
-                    className="hidden"
-                    disabled={isLoading}
-                  />
-                </div>
-              </label>
-            </div>
-          )}
 
           {/* Keterangan */}
           <div>
