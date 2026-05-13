@@ -291,7 +291,7 @@ export default function PetugasDashboardPage() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-bold text-slate-800">Dokumentasi Terakhir</h2>
           <button
-            onClick={() => router.push('/petugas/dokumentasi')}
+            onClick={() => router.push(`/petugas/riwayat/${assignment?.id}`)}
             className="text-sm text-blue-600 font-semibold hover:underline">
             Lihat semua
           </button>
