@@ -172,24 +172,6 @@ export default function QRCodePage() {
               <br />
               Tunjukkan QR Code ini kepada petugas saat distribusi bantuan sosial
             </p>
-            <div className="flex gap-3 w-full">
-              <button
-                onClick={() => {
-                  downloadFile(qrCode.url_gambar_qr, `${qrCode.token_qr}.svg`)
-                }}
-                disabled={downloading}
-                className="flex-1 flex items-center justify-center gap-2 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed">
-                <Download className="w-4 h-4" />
-                {downloading ? 'Mengunduh...' : 'Unduh'}
-              </button>
-              <button
-                onClick={handleShare}
-                disabled={sharing}
-                className="flex-1 flex items-center justify-center gap-2 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition-colors disabled:opacity-50">
-                <Share2 className="w-4 h-4" />
-                Bagikan
-              </button>
-            </div>
           </div>
         </div>
       ) : (

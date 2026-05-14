@@ -142,6 +142,17 @@ export const masyarakatService = {
     }
   },
 
+  async getAllPengajuan(token: string): Promise<PengajuanStatus[]> {
+    try {
+      const response = await API.get('/masyarakat/pengajuan/getAll', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to get pengajuan status')
+    }
+  },
+
   async getQRCode(token: string): Promise<QRCodeResponse> {
     try {
       const response = await API.get('/masyarakat/qrcode', {
