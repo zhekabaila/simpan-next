@@ -23,6 +23,7 @@ export function UploadDokumentasiDialog({ open, onOpenChange, onSubmit, isLoadin
   const jenis = 'foto' // Only foto is allowed
   const [file, setFile] = useState<File | null>(null)
   const [fileName, setFileName] = useState('')
+  const [filePreview, setFilePreview] = useState<string | null>(null)
   const [keterangan, setKeterangan] = useState('')
   const [error, setError] = useState('')
 
@@ -31,6 +32,7 @@ export function UploadDokumentasiDialog({ open, onOpenChange, onSubmit, isLoadin
     if (!selectedFile) {
       setFile(null)
       setFileName('')
+      setFilePreview(null)
       return
     }
 
@@ -40,6 +42,7 @@ export function UploadDokumentasiDialog({ open, onOpenChange, onSubmit, isLoadin
       setError('Format gambar harus JPEG, PNG, atau GIF')
       setFile(null)
       setFileName('')
+      setFilePreview(null)
       return
     }
 
@@ -49,11 +52,13 @@ export function UploadDokumentasiDialog({ open, onOpenChange, onSubmit, isLoadin
       setError('Ukuran gambar tidak boleh lebih dari 5MB')
       setFile(null)
       setFileName('')
+      setFilePreview(null)
       return
     }
 
     setFile(selectedFile)
     setFileName(selectedFile.name)
+    setFilePreview(URL.createObjectURL(selectedFile))
     setError('')
   }
 
@@ -74,6 +79,7 @@ export function UploadDokumentasiDialog({ open, onOpenChange, onSubmit, isLoadin
       // Reset form
       setFile(null)
       setFileName('')
+      setFilePreview(null)
       setKeterangan('')
       setError('')
       onOpenChange(false)
@@ -97,30 +103,65 @@ export function UploadDokumentasiDialog({ open, onOpenChange, onSubmit, isLoadin
             <label className="block text-sm font-medium text-slate-700 mb-2">
               Foto <span className="text-red-500">*</span>
             </label>
-            <label className="block">
-              <div className="border-2 border-dashed border-slate-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
-                {fileName ? (
-                  <div className="space-y-1">
-                    <ImageIcon className="w-6 h-6 text-blue-500 mx-auto" />
-                    <p className="text-sm font-medium text-slate-700">{fileName}</p>
-                    <p className="text-xs text-slate-500">Klik untuk ubah foto</p>
-                  </div>
-                ) : (
+            
+            {/* Preview or Upload Area */}
+            {filePreview ? (
+              <div className="space-y-3">
+                {/* Preview */}
+                <div className="w-full bg-slate-100 rounded-lg overflow-hidden">
+                  <img 
+                    src={filePreview} 
+                    alt="Preview" 
+                    className="w-full h-48 object-cover"
+                  />
+                </div>
+                
+                {/* File Info */}
+                <div className="bg-blue-50 border border-blue-100 rounded-lg p-3">
+                  <p className="text-sm font-semibold text-blue-900">{fileName}</p>
+                  <p className="text-xs text-blue-600 mt-1">
+                    Klik tombol di bawah untuk ubah foto
+                  </p>
+                </div>
+
+                {/* Hidden File Input for Change */}
+                <label className="block">
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif"
+                    onChange={handleFileChange}
+                    className="hidden"
+                    disabled={isLoading}
+                  />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      const input = e.currentTarget.parentElement?.querySelector('input[type="file"]') as HTMLInputElement
+                      input?.click()
+                    }}
+                    className="w-full px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition-colors">
+                    Ubah Foto
+                  </button>
+                </label>
+              </div>
+            ) : (
+              <label className="block">
+                <div className="border-2 border-dashed border-slate-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
                   <div className="space-y-1">
                     <Upload className="w-6 h-6 text-slate-400 mx-auto" />
                     <p className="text-sm font-medium text-slate-700">Pilih foto</p>
                     <p className="text-xs text-slate-500">Max 5MB • JPEG, PNG, GIF</p>
                   </div>
-                )}
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/gif"
-                  onChange={handleFileChange}
-                  className="hidden"
-                  disabled={isLoading}
-                />
-              </div>
-            </label>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif"
+                    onChange={handleFileChange}
+                    className="hidden"
+                    disabled={isLoading}
+                  />
+                </div>
+              </label>
+            )}
           </div>
 
           {/* Keterangan */}

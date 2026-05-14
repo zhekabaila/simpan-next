@@ -432,6 +432,17 @@ export const adminService = {
     }
   },
 
+  async deleteUser(token: string, id: string): Promise<any> {
+    try {
+      const response = await API.delete(`/admin/pengguna/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      return response.data
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to delete pengguna')
+    }
+  },
+
   async getDokumentasiByPeriode(token: string, periode_id: string, page: number = 1, limit: number = 15): Promise<any> {
     try {
       const response = await API.get(`/admin/dokumentasi-periode/${periode_id}`, {
@@ -442,5 +453,5 @@ export const adminService = {
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to get dokumentasi')
     }
-  },
+  }
 }

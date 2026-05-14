@@ -2,8 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { ArrowLeft, Search, Filter, AlertCircle, MapPin } from 'lucide-react'
+import { ArrowLeft, Search, Filter, AlertCircle, MapPin, Trash2, Upload } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog'
 import { StatusBadge } from '@/components/core/StatusBadge'
+import { UploadDokumentasiDialog } from '@/components/dialogs/upload-dokumentasi-dialog'
 import ImageViewer from '@/components/core/image-viewer'
 import { formatUTCDate } from '@/lib/utils'
 import useAuthStore from '@/app/_stores/useAuthStore'
@@ -42,6 +52,11 @@ export default function DetailPenugasanPage() {
 
   // Dokumentasi
   const [dokumentasi, setDokumentasi] = useState<any[]>([])
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [deleteLoading, setDeleteLoading] = useState(false)
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
+  const [uploadLoading, setUploadLoading] = useState(false)
 
   // Loading states
   const [loading, setLoading] = useState(true)
@@ -136,6 +151,76 @@ export default function DetailPenugasanPage() {
 
     fetchRiwayat()
   }, [token, periodeBansosId, riwayatPage, filterStatus, loading])
+
+  const handleDeleteDokumentasi = async () => {
+    if (!token || !deletingId) return
+
+    setDeleteLoading(true)
+    try {
+      await petugasService.deleteDokumentasi(token, deletingId)
+
+      toast.success('Dokumentasi berhasil dihapus!', {
+        description: 'File dokumentasi telah dihapus dari sistem',
+        duration: 2000
+      })
+
+      // Refresh dokumentasi list
+      if (periodeBansosId) {
+        const dokResult = await petugasService.getDokumentasiByPeriode(token, periodeBansosId, 1, 10)
+        if (dokResult.data) {
+          setDokumentasi(dokResult.data)
+        }
+      }
+
+      setDeleteDialogOpen(false)
+      setDeletingId(null)
+    } catch (err: any) {
+      const errorMsg = err?.message || 'Gagal menghapus dokumentasi'
+      toast.error('Error', {
+        description: errorMsg,
+        duration: 3000
+      })
+    } finally {
+      setDeleteLoading(false)
+    }
+  }
+
+  const handleUploadDokumentasi = async (jenis_dokumentasi: 'foto' | 'catatan', file: File | null, keterangan: string) => {
+    if (!token || !periodeBansosId) {
+      throw new Error('Data tidak lengkap')
+    }
+
+    setUploadLoading(true)
+    try {
+      const result = await petugasService.uploadDokumentasi(
+        token,
+        periodeBansosId,
+        jenis_dokumentasi,
+        file,
+        keterangan
+      )
+
+      toast.success('Dokumentasi berhasil diupload!', {
+        description: `Dokumentasi ${jenis_dokumentasi} telah disimpan`,
+        duration: 2000
+      })
+
+      // Refresh dokumentasi list
+      const dokResult = await petugasService.getDokumentasiByPeriode(token, periodeBansosId, 1, 10)
+      if (dokResult.data) {
+        setDokumentasi(dokResult.data)
+      }
+    } catch (err: any) {
+      const errorMsg = err?.message || 'Gagal mengupload dokumentasi'
+      toast.error('Error', {
+        description: errorMsg,
+        duration: 3000
+      })
+      throw err
+    } finally {
+      setUploadLoading(false)
+    }
+  }
 
   const filtered = riwayatData.filter((r) => {
     const matchSearch = r.profil_masyarakat.nama.toLowerCase().includes(search.toLowerCase())
@@ -256,6 +341,15 @@ export default function DetailPenugasanPage() {
           </div>
         ))}
       </div>
+
+      {/* Upload Dokumentasi Button */}
+      <button
+        onClick={() => setUploadDialogOpen(true)}
+        disabled={!penugasan || penugasan.periode.status !== 'aktif'}
+        className="w-full py-4 bg-green-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-green-700 text-white font-bold rounded-2xl transition-all flex items-center justify-center gap-3 shadow-lg shadow-green-200 mb-4">
+        <Upload className="w-6 h-6" />
+        <span className="text-base">Upload Dokumentasi</span>
+      </button>
 
       {/* Riwayat Distribusi */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-4">
@@ -388,16 +482,59 @@ export default function DetailPenugasanPage() {
                     <p className="text-xs text-slate-400">
                       {dokDate} · {dokTime}
                     </p>
+                    {dok.keterangan && (
+                      <p className="text-xs text-slate-600 mt-1 italic">{dok.keterangan}</p>
+                    )}
                   </div>
-                  <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full font-medium whitespace-nowrap">
-                    {dok.jenis_dokumentasi === 'foto' ? 'Foto' : 'Catatan'}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full font-medium whitespace-nowrap">
+                      {dok.jenis_dokumentasi === 'foto' ? 'Foto' : 'Catatan'}
+                    </span>
+                    <button
+                      onClick={() => {
+                        setDeletingId(dok.id)
+                        setDeleteDialogOpen(true)
+                      }}
+                      className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Hapus dokumentasi">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               )
             })}
           </div>
         )}
       </div>
+
+      {/* Delete Dokumentasi Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Dokumentasi?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Dokumentasi yang dihapus tidak dapat dipulihkan. Apakah Anda yakin ingin menghapus dokumentasi ini?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex gap-2 justify-end">
+            <AlertDialogCancel disabled={deleteLoading}>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteDokumentasi}
+              disabled={deleteLoading}
+              className="bg-red-600 hover:bg-red-700 disabled:opacity-50">
+              {deleteLoading ? 'Menghapus...' : 'Hapus'}
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Upload Dokumentasi Dialog */}
+      <UploadDokumentasiDialog
+        open={uploadDialogOpen}
+        onOpenChange={setUploadDialogOpen}
+        onSubmit={handleUploadDokumentasi}
+        isLoading={uploadLoading}
+      />
     </div>
   )
 }

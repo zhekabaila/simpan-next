@@ -9,6 +9,7 @@ import { adminService } from '@/services/admin'
 import { getPaginationLabel, formatUTCDate } from '@/lib/utils'
 import { CreateUserDialog } from '@/components/dialogs/create-user-dialog'
 import { UserDetailDialog } from '@/components/dialogs/user-detail-dialog'
+import { DeleteUserDialog } from '@/components/dialogs/delete-user-dialog'
 import { toast } from 'sonner'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
@@ -57,6 +58,9 @@ export default function PenggunaPage() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
   const [selectedUserIdForDetail, setSelectedUserIdForDetail] = useState('')
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [selectedUserForDelete, setSelectedUserForDelete] = useState<any>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   // Fetch users
   useEffect(() => {
@@ -171,6 +175,42 @@ export default function PenggunaPage() {
     }
   }
 
+  const handleDeleteUser = async () => {
+    if (!token || !selectedUserForDelete) return
+
+    setIsDeleting(true)
+    try {
+      await adminService.deleteUser(token, selectedUserForDelete.id)
+
+      toast.success('Pengguna berhasil dihapus', {
+        description: `${selectedUserForDelete.nama} telah dihapus dari sistem`,
+        duration: 2000
+      })
+
+      // Refresh list
+      const result = await adminService.getDaftarPengguna(
+        token,
+        parsedPage,
+        parsedLimit,
+        parsedRole !== 'semua' ? parsedRole : undefined
+      )
+      if (result.data) {
+        setUsers(result.data)
+      }
+
+      setIsDeleteDialogOpen(false)
+      setSelectedUserForDelete(null)
+    } catch (err: any) {
+      const errorMsg = err?.message || 'Gagal menghapus pengguna'
+      toast.error('Error', {
+        description: errorMsg,
+        duration: 3000
+      })
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   if (error) {
     return (
       <div className="space-y-5">
@@ -253,7 +293,7 @@ export default function PenggunaPage() {
                 <th className="text-left py-3 px-4 font-semibold">Nama</th>
                 <th className="text-left py-3 px-4 font-semibold">Email</th>
                 <th className="text-left py-3 px-4 font-semibold">Peran</th>
-                <th className="text-left py-3 px-4 font-semibold">Status</th>
+                <th className="text-left py-3 px-4 font-semibold">Status Pengajuan</th>
                 <th className="text-left py-3 px-4 font-semibold">Bergabung</th>
                 <th className="text-left py-3 px-4 font-semibold">Aksi</th>
               </tr>
@@ -283,16 +323,22 @@ export default function PenggunaPage() {
                         </div>
                       </td>
                       <td className="py-3.5 px-4">
-                        <button
-                          onClick={() => handleToggleStatus(user.id)}
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-colors cursor-pointer ${
-                            user.aktif
-                              ? 'bg-green-50 text-green-700 hover:bg-green-100'
-                              : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-                          }`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${user.aktif ? 'bg-green-500' : 'bg-slate-400'}`} />
-                          {user.aktif ? 'Aktif' : 'Nonaktif'}
-                        </button>
+                        {user?.role === 'masyarakat' ? (
+                          <button
+                            onClick={() => handleToggleStatus(user.id)}
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-colors cursor-pointer ${
+                              user?.profil?.status_pengajuan === 'disetujui'
+                                ? 'bg-green-50 text-green-700 hover:bg-green-100'
+                                : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                            }`}>
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${user?.profil?.status_pengajuan === 'disetujui' ? 'bg-green-500' : 'bg-slate-400'}`}
+                            />
+                            {user?.profil?.status_pengajuan === 'disetujui' ? 'Disetujui' : 'Belum Disetujui'}
+                          </button>
+                        ) : (
+                          <div>-</div>
+                        )}
                       </td>
                       <td className="py-3.5 px-4 text-sm text-slate-500">{bergabung}</td>
                       <td className="py-3.5 px-4">
@@ -312,16 +358,14 @@ export default function PenggunaPage() {
                                 className="w-full text-left px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-md transition-colors">
                                 Detail
                               </button>
-                              {/* <button
-                                disabled
-                                className="w-full text-left px-3 py-2 text-sm font-medium text-slate-400 cursor-not-allowed">
-                                Edit (Segera Hadir)
-                              </button>
                               <button
-                                disabled
-                                className="w-full text-left px-3 py-2 text-sm font-medium text-slate-400 cursor-not-allowed">
-                                Hapus (Segera Hadir)
-                              </button> */}
+                                onClick={() => {
+                                  setSelectedUserForDelete(user)
+                                  setIsDeleteDialogOpen(true)
+                                }}
+                                className="w-full text-left px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-colors">
+                                Hapus
+                              </button>
                             </div>
                           </PopoverContent>
                         </Popover>
@@ -361,6 +405,13 @@ export default function PenggunaPage() {
         onOpenChange={setIsDetailDialogOpen}
         userId={selectedUserIdForDetail}
         token={token || ''}
+      />
+      <DeleteUserDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        user={selectedUserForDelete}
+        onConfirm={handleDeleteUser}
+        isLoading={isDeleting}
       />
     </div>
   )

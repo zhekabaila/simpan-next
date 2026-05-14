@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import useAuthStore from '@/app/_stores/useAuthStore'
 import { petugasService } from '@/services/petugas'
 import { StatusBadge } from '@/components/core/StatusBadge'
+import { ConfirmMarkTerimaDialog } from '@/components/dialogs/confirm-mark-terima-dialog'
 
 // Dynamic import untuk menghindari SSR issues
 const Scanner = dynamic(() => import('@yudiel/react-qr-scanner').then((mod) => mod.Scanner), { ssr: false })
@@ -35,6 +36,8 @@ export default function ScanQRPage() {
   const [masyarakatList, setMasyarakatList] = useState<MasyarakatItem[]>([])
   const [loadingList, setLoadingList] = useState(false)
   const [markingId, setMarkingId] = useState<string | null>(null)
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
+  const [confirmItem, setConfirmItem] = useState<MasyarakatItem | null>(null)
 
   // Get user location on mount
   useEffect(() => {
@@ -462,7 +465,10 @@ export default function ScanQRPage() {
                 {masyarakatList.map((item) => (
                   <button
                     key={item.profil_masyarakat_id}
-                    onClick={() => handleMarkTerima(item)}
+                    onClick={() => {
+                      setConfirmItem(item)
+                      setConfirmDialogOpen(true)
+                    }}
                     disabled={item.status_penerimaan === 'sudah_menerima' || markingId === item.profil_masyarakat_id}
                     className={`w-full flex items-center gap-3 p-4 rounded-2xl border-2 transition-all text-left ${
                       item.status_penerimaan === 'sudah_menerima'
@@ -521,6 +527,21 @@ export default function ScanQRPage() {
           )}
         </div>
       )}
+
+      {/* Confirmation Dialog */}
+      <ConfirmMarkTerimaDialog
+        open={confirmDialogOpen}
+        onOpenChange={setConfirmDialogOpen}
+        item={confirmItem}
+        onConfirm={async () => {
+          if (confirmItem) {
+            await handleMarkTerima(confirmItem)
+            setConfirmDialogOpen(false)
+            setConfirmItem(null)
+          }
+        }}
+        isLoading={markingId !== null}
+      />
     </>
   )
 }

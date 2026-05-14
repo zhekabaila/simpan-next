@@ -2,7 +2,16 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { QrCode, MapPin, Users, CheckCircle2, Clock, AlertCircle, Upload } from 'lucide-react'
+import { QrCode, MapPin, Users, CheckCircle2, Clock, AlertCircle, Upload, Trash2 } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog'
 import { StatusBadge } from '@/components/core/StatusBadge'
 import { UploadDokumentasiDialog } from '@/components/dialogs/upload-dokumentasi-dialog'
 import ImageViewer from '@/components/core/image-viewer'
@@ -20,6 +29,9 @@ export default function PetugasDashboardPage() {
   const [error, setError] = useState('')
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
   const [uploadLoading, setUploadLoading] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   useEffect(() => {
     if (!token) return
@@ -33,7 +45,14 @@ export default function PetugasDashboardPage() {
           setAssignment(activeAssignment)
 
           // Fetch recent scans for this assignment
-          const scansResult = await petugasService.getRiwayatDistribusi(token, 1, 4)
+          const scansResult = await petugasService.getRiwayatDistribusi(
+            token,
+            1,
+            4,
+            undefined,
+            undefined,
+            activeAssignment?.periode_bansos_id
+          )
           if (scansResult.data) {
             setRecentScans(scansResult.data)
           }
@@ -77,6 +96,12 @@ export default function PetugasDashboardPage() {
         description: `Dokumentasi ${jenis_dokumentasi} telah disimpan`,
         duration: 2000
       })
+
+      // Refresh dokumentasi list
+      const dokResult = await petugasService.getDokumentasiByPeriode(token, assignment.periode_bansos_id, 1, 4)
+      if (dokResult.data) {
+        setRecentDokumentasi(dokResult.data)
+      }
     } catch (err: any) {
       const errorMsg = err?.message || 'Gagal mengupload dokumentasi'
       toast.error('Error', {
@@ -86,6 +111,39 @@ export default function PetugasDashboardPage() {
       throw err
     } finally {
       setUploadLoading(false)
+    }
+  }
+
+  const handleDeleteDokumentasi = async () => {
+    if (!token || !deletingId) return
+
+    setDeleteLoading(true)
+    try {
+      await petugasService.deleteDokumentasi(token, deletingId)
+
+      toast.success('Dokumentasi berhasil dihapus!', {
+        description: 'File dokumentasi telah dihapus dari sistem',
+        duration: 2000
+      })
+
+      // Refresh dokumentasi list
+      if (assignment) {
+        const dokResult = await petugasService.getDokumentasiByPeriode(token, assignment.periode_bansos_id, 1, 4)
+        if (dokResult.data) {
+          setRecentDokumentasi(dokResult.data)
+        }
+      }
+
+      setDeleteDialogOpen(false)
+      setDeletingId(null)
+    } catch (err: any) {
+      const errorMsg = err?.message || 'Gagal menghapus dokumentasi'
+      toast.error('Error', {
+        description: errorMsg,
+        duration: 3000
+      })
+    } finally {
+      setDeleteLoading(false)
     }
   }
 
@@ -251,7 +309,7 @@ export default function PetugasDashboardPage() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-bold text-slate-800">Scan Terakhir</h2>
           <button
-            onClick={() => router.push('/petugas/riwayat')}
+            onClick={() => router.push(`/petugas/riwayat/${assignment?.id}`)}
             className="text-sm text-blue-600 font-semibold hover:underline">
             Lihat semua
           </button>
@@ -340,10 +398,22 @@ export default function PetugasDashboardPage() {
                     <p className="text-xs text-slate-400">
                       {dokDate} · {dokTime}
                     </p>
+                    {dok.keterangan && <p className="text-xs text-slate-600 mt-1 italic">{dok.keterangan}</p>}
                   </div>
-                  <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full font-medium whitespace-nowrap">
-                    {dok.jenis_dokumentasi === 'foto' ? 'Foto' : 'Catatan'}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full font-medium whitespace-nowrap">
+                      {dok.jenis_dokumentasi === 'foto' ? 'Foto' : 'Catatan'}
+                    </span>
+                    <button
+                      onClick={() => {
+                        setDeletingId(dok.id)
+                        setDeleteDialogOpen(true)
+                      }}
+                      className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Hapus dokumentasi">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               )
             })}
@@ -358,6 +428,27 @@ export default function PetugasDashboardPage() {
         onSubmit={handleUploadDokumentasi}
         isLoading={uploadLoading}
       />
+
+      {/* Delete Dokumentasi Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Dokumentasi?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Dokumentasi yang dihapus tidak dapat dipulihkan. Apakah Anda yakin ingin menghapus dokumentasi ini?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex gap-2 justify-end">
+            <AlertDialogCancel disabled={deleteLoading}>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteDokumentasi}
+              disabled={deleteLoading}
+              className="bg-red-600 hover:bg-red-700 disabled:opacity-50">
+              {deleteLoading ? 'Menghapus...' : 'Hapus'}
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
